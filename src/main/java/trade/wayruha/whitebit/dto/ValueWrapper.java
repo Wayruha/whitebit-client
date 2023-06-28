@@ -11,9 +11,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Lightweight wrapper for a generic value.
+ * WhiteBit may respond with an array consisting of a single value (the response either object or array)
+ * This class is used to parse such values as objects
+ */
 @JsonDeserialize(using = ValueWrapper.ValueDeserializer.class)
 public class ValueWrapper<T> {
-  private List<T> list;
+  private final List<T> list;
 
   public ValueWrapper(List<T> wrappedValue) {
     if (wrappedValue.size() != 1) throw new IllegalArgumentException("There should be exactly one content item");

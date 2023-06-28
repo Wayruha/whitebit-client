@@ -5,6 +5,8 @@ import trade.wayruha.whitebit.TestConstants;
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.domain.AssetBalance;
 
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -20,5 +22,7 @@ public class WalletServiceTest {
     assertNotNull(balance.getAvailable());
     assertNotNull(balance.getFreeze());
 
+    final Map<String, AssetBalance> balances = service.getTradeBalances();
+    assertNotNull(balances);
   }
 }

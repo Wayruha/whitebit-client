@@ -2,14 +2,12 @@ package trade.wayruha.whitebit.service;
 
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.domain.AssetBalance;
-import trade.wayruha.whitebit.dto.WBRequest;
-import trade.wayruha.whitebit.dto.WBResponse;
 import trade.wayruha.whitebit.dto.request.TickerParam;
 import trade.wayruha.whitebit.service.endpoint.WalletEndpoint;
 
 import java.util.Map;
 
-public class WalletService extends ServiceBase{
+public class WalletService extends ServiceBase {
   private final WalletEndpoint api;
 
   public WalletService(WBConfig config) {
@@ -20,20 +18,18 @@ public class WalletService extends ServiceBase{
   public AssetBalance getTradeBalance(String asset) {
     asset = asset.toUpperCase();
     final TickerParam ticker = new TickerParam(asset);
-    final WBRequest<TickerParam> req = WBRequest.request(api.GET_TRADE_BALANCE_PATH, ticker);
-    final Map<String, AssetBalance> balances = client.executeSync(api.getTradeBalance(req)).getData();
-    populateAssetBalance(balances);
-    return balances.get(asset);
+    final AssetBalance balance = client.executeSync(api.getTradeBalance(ticker)).getData();
+    balance.setAsset(asset);
+    return balance;
   }
 
   public Map<String, AssetBalance> getTradeBalances() {
-    final WBRequest<TickerParam> req = WBRequest.request(api.GET_TRADE_BALANCE_PATH, null);
-    final Map<String, AssetBalance> balances = client.executeSync(api.getTradeBalance(req)).getData();
+    final Map<String, AssetBalance> balances = client.executeSync(api.getTradeBalances()).getData();
     populateAssetBalance(balances);
     return balances;
   }
 
-  private static void populateAssetBalance(Map<String, AssetBalance> balancesMap){
+  private static void populateAssetBalance(Map<String, AssetBalance> balancesMap) {
     balancesMap.forEach((key, value) -> value.setAsset(key));
   }
 }

@@ -10,7 +10,7 @@ public class WBConfig {
 
   private String apiKey;
   private String apiSecret;
-  private String endpoint = DEFAULT_HTTP_HOST;
+  private String host = DEFAULT_HTTP_HOST;
   private String webSocketHost = DEFAULT_WS_HOST;
 
   /**

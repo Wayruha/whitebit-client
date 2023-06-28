@@ -4,22 +4,32 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okio.Buffer;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import trade.wayruha.whitebit.client.APIConstant;
+import trade.wayruha.whitebit.client.ClientConfig;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.time.Instant;
 import java.util.Base64;
 import java.util.Formatter;
 
-import static java.util.Objects.isNull;
+import static java.lang.String.format;
 import static trade.wayruha.whitebit.client.APIConstant.*;
 
+/**
+ * A request interceptor that injects the API Key Header into requests and signs messages.
+ */
 @Slf4j
 public class AuthenticationInterceptor implements Interceptor {
+  private static final String REQUEST_JSON_PARAMETER_FORMAT = "\"request\":\"%s\"";
+  private static final String MANDATORY_PARAM_NONCE = "\"nonce\":%d";
+  private static final String MANDATORY_PARAM_NONCE_WINDOW = "\"nonceWindow\":%b";
+  private static final char JSON_OBJECT_END = '}';
+  private static final char COMMA = ',';
+
   private final String apiKey;
   private final String apiSecret;
 
@@ -31,43 +41,48 @@ public class AuthenticationInterceptor implements Interceptor {
   @NotNull
   @Override
   public Response intercept(Chain chain) throws IOException {
-    Request origRequest = chain.request();
-    String method = origRequest.method();
-    //check
-    final Request.Builder builder = origRequest.newBuilder();
+    final Request origRequest = chain.request();
     final boolean isSigned = origRequest.header(APIConstant.ENDPOINT_SECURITY_SIGNED) != null;
+    if (!isSigned) return chain.proceed(origRequest);
+    if (!origRequest.method().equalsIgnoreCase("POST"))
+      throw new IllegalArgumentException("Only POST is allowed for signed requests and they must have a RequestBody:" + origRequest.url());
+
+    final Request.Builder builder = origRequest.newBuilder();
     builder.removeHeader(APIConstant.ENDPOINT_SECURITY_SIGNED);
-    if (isSigned) {
-      final RequestBody body = origRequest.body();
-      if (isNull(body) || body.contentLength() == 0 || !method.equalsIgnoreCase("POST"))
-        throw new IllegalArgumentException("Only POST is allowed for signed requests and they must have a RequestBody:" + origRequest.url());
-      // encode RequestBody
-      builder.addHeader(HEADER_ACCESS_KEY, apiKey);
-      builder.addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON);
-      final String encodedBody = encodeBody(body);
-      builder.addHeader(HEADER_PAYLOAD, encodedBody);
-      builder.addHeader(HEADER_SIGNATURE, sign(encodedBody, apiSecret));
-    }
+    final RequestBody body = origRequest.body();
+    builder.addHeader(HEADER_ACCESS_KEY, apiKey);
+    builder.addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON);
+    final String newBody = enrichBody(body, origRequest);
+    final String encodedBody = encodeBody(newBody);
+    builder.addHeader(HEADER_PAYLOAD, encodedBody);
+    builder.addHeader(HEADER_SIGNATURE, sign(encodedBody, apiSecret));
+    final MediaType MEDIA_TYPE_JSON = MediaType.get("application/json");
+    builder.post(RequestBody.create(MEDIA_TYPE_JSON, newBody));
     return chain.proceed(builder.build());
   }
 
- /* private Request encodeUrl(Request request) {
-    String timestamp = Instant.now().toEpochMilli() + "";
-    HttpUrl url = request.url();
-    HttpUrl.Builder urlBuilder = url
-        .newBuilder()
-        .setQueryParameter("timestamp", timestamp);
-    String queryParams = urlBuilder.build().query();
-    final String signature = SignatureUtil.actualSignature(queryParams, apiSecret);
-    urlBuilder.setQueryParameter("timestamp", signature);
-    return request.newBuilder()
-        .addHeader(HEADER_ACCESS_KEY, apiKey)
-        .url(urlBuilder.build()).build();
-  }*/
+  private static String encodeBody(String enrichedBody) {
+   return Base64.getEncoder().encodeToString(enrichedBody.getBytes());
+ }
 
-  private String encodeBody(RequestBody origBody) {
-    final String str = bodyToString(origBody);
-    return Base64.getEncoder().encodeToString(str.getBytes());
+  /**
+   * All signed endpoints requires sending some mandatory parameters
+   * This method enrich existing RequestBody (json) with mandatory parameters.
+   * Algorithm: find the end of the root object and prepend it with json parameters
+   */
+  private String enrichBody(RequestBody origBody, Request req){
+    String bodyJson = bodyToString(origBody);
+    if(StringUtils.isBlank(bodyJson)) bodyJson = "{}";
+
+    final String url = req.url().encodedPath();
+    final String actionPart = format(REQUEST_JSON_PARAMETER_FORMAT, url);
+    final String noncePart = format(MANDATORY_PARAM_NONCE, ClientConfig.getCurrentTime());
+    final String nonceWindowPart = format(MANDATORY_PARAM_NONCE_WINDOW, ClientConfig.isEnableNonceWindow());
+    String mainPart = bodyJson.substring(0, bodyJson.lastIndexOf(JSON_OBJECT_END));
+    return mainPart + (mainPart.length() > 2 ? COMMA : "") +
+        actionPart + COMMA +
+        noncePart + COMMA +
+        nonceWindowPart + JSON_OBJECT_END;
   }
 
   @SneakyThrows

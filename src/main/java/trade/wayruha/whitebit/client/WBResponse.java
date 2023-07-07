@@ -1,4 +1,4 @@
-package trade.wayruha.whitebit.dto;
+package trade.wayruha.whitebit.client;
 
 import lombok.Getter;
 import lombok.ToString;

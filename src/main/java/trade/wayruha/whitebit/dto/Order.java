@@ -1,4 +1,4 @@
-package trade.wayruha.whitebit.dto.response;
+package trade.wayruha.whitebit.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
@@ -8,7 +8,7 @@ import trade.wayruha.whitebit.domain.OrderType;
 import java.math.BigDecimal;
 
 @Data
-public class OrderResponse {
+public class Order {
   private Long orderId;
   private String clientOrderId;
   private String market;

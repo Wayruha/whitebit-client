@@ -1,7 +1,7 @@
 package trade.wayruha.whitebit.service;
 
 import trade.wayruha.whitebit.WBConfig;
-import trade.wayruha.whitebit.client.APIConstant;
+import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.client.ApiClient;
 
 public abstract class ServiceBase {

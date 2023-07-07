@@ -4,7 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
-import trade.wayruha.whitebit.client.APIConstant;
+import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.domain.AssetBalance;
 import trade.wayruha.whitebit.dto.request.TickerParam;
 

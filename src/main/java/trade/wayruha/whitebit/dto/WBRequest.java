@@ -1,3 +1,4 @@
+/*
 package trade.wayruha.whitebit.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -23,3 +24,4 @@ public class WBRequest<T> {
     return new WBRequest<>(url, params, Main.getCurrentTime(), true);
   }
 }
+*/

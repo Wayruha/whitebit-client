@@ -1,4 +1,4 @@
-package trade.wayruha.whitebit;
+package trade.wayruha.whitebit.exception;
 
 import java.util.List;
 import java.util.Map;

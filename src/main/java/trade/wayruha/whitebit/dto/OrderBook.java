@@ -1,4 +1,4 @@
-package trade.wayruha.whitebit.dto.response;
+package trade.wayruha.whitebit.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.core.JacksonException;
@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.Value;
+import trade.wayruha.whitebit.domain.Market;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -17,10 +18,12 @@ import java.util.List;
 @Data
 public class OrderBook {
   @JsonAlias("ticker_id")
-  private String tickerId;
+  private Market tickerId;
   private long timestamp;
   private List<Level> asks;
   private List<Level> bids;
+
+  //TODO add methods to apply partial updates
 
   @Value
   @JsonDeserialize(using = Level.LevelDeserializer.class)

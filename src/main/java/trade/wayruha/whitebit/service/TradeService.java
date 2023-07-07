@@ -2,7 +2,7 @@ package trade.wayruha.whitebit.service;
 
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.dto.request.OrderRequest;
-import trade.wayruha.whitebit.dto.response.OrderResponse;
+import trade.wayruha.whitebit.dto.Order;
 import trade.wayruha.whitebit.service.endpoint.TradeEndpoint;
 
 public class TradeService extends ServiceBase {
@@ -13,7 +13,7 @@ public class TradeService extends ServiceBase {
     this.api = createService(TradeEndpoint.class);
   }
 
-  public OrderResponse createOrder(OrderRequest order) {
+  public Order createOrder(OrderRequest order) {
     return client.executeSync(api.createOrder(order)).getData();
   }
 }

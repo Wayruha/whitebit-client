@@ -2,8 +2,8 @@ package trade.wayruha.whitebit.service;
 
 import org.jetbrains.annotations.Nullable;
 import trade.wayruha.whitebit.WBConfig;
-import trade.wayruha.whitebit.dto.response.MarketInfo;
-import trade.wayruha.whitebit.dto.response.OrderBook;
+import trade.wayruha.whitebit.dto.MarketInfo;
+import trade.wayruha.whitebit.dto.OrderBook;
 import trade.wayruha.whitebit.service.endpoint.MarketDataEndpoint;
 
 import java.util.List;

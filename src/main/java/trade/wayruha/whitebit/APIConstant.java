@@ -1,10 +1,10 @@
-package trade.wayruha.whitebit.client;
+package trade.wayruha.whitebit;
 
 public class APIConstant {
   /**
    * The default timeout is 30 seconds.
    */
-  public static final long TIMEOUT = 1000 * 30;
+  public static final long HTTP_CLIENT_TIMEOUT_MS = 30 * 1000;
 
   /**
    * max allowed discrepancy in nonce (i.e., timestamp, millis)
@@ -25,5 +25,7 @@ public class APIConstant {
   public static final String LISTEN_KEY_QUERY_PARAM = "listenKey";
 
   public static final String CRYPTO_HMAC_SHA512 = "HmacSHA512";
+
+  public static final int MAX_WS_BATCH_SUBSCRIPTIONS = 1000;
 
 }

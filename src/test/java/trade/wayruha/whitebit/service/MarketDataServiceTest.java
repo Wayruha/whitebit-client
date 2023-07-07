@@ -3,8 +3,8 @@ package trade.wayruha.whitebit.service;
 import org.junit.Test;
 import trade.wayruha.whitebit.TestConstants;
 import trade.wayruha.whitebit.WBConfig;
-import trade.wayruha.whitebit.dto.response.MarketInfo;
-import trade.wayruha.whitebit.dto.response.OrderBook;
+import trade.wayruha.whitebit.dto.MarketInfo;
+import trade.wayruha.whitebit.dto.OrderBook;
 
 import java.util.List;
 import static org.junit.Assert.*;

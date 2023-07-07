@@ -1,4 +1,4 @@
-package trade.wayruha.whitebit.dto.response;
+package trade.wayruha.whitebit.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;

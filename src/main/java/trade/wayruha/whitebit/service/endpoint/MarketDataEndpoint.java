@@ -5,8 +5,8 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import trade.wayruha.whitebit.dto.ValueWrapper;
-import trade.wayruha.whitebit.dto.response.MarketInfo;
-import trade.wayruha.whitebit.dto.response.OrderBook;
+import trade.wayruha.whitebit.dto.MarketInfo;
+import trade.wayruha.whitebit.dto.OrderBook;
 
 import java.util.List;
 

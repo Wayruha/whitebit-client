@@ -9,16 +9,15 @@ import okhttp3.WebSocketListener;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import trade.wayruha.whitebit.WBCloudException;
+import trade.wayruha.whitebit.exception.WBCloudException;
 import trade.wayruha.whitebit.WBConfig;
-import trade.wayruha.whitebit.dto.WBResponse;
 import trade.wayruha.whitebit.client.helper.HttpClientBuilder;
 import trade.wayruha.whitebit.client.helper.RetrofitBuilder;
 
 import java.io.IOException;
 
 import static java.util.Objects.nonNull;
-import static trade.wayruha.whitebit.client.APIConstant.API_CLIENT_ERROR_MESSAGE_PARSE_EXCEPTION;
+import static trade.wayruha.whitebit.APIConstant.API_CLIENT_ERROR_MESSAGE_PARSE_EXCEPTION;
 
 @Slf4j
 public class ApiClient {

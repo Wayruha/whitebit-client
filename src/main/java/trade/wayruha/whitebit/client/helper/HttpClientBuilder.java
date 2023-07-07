@@ -24,11 +24,11 @@ public class HttpClientBuilder {
 
     public OkHttpClient buildClient() {
         final OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        clientBuilder.connectTimeout(this.config.getConnectTimeout(), TimeUnit.SECONDS)
-                .readTimeout(this.config.getReadTimeout(), TimeUnit.SECONDS)
-                .writeTimeout(this.config.getWriteTimeout(), TimeUnit.SECONDS)
+        clientBuilder.connectTimeout(this.config.getHttpConnectTimeout(), TimeUnit.MILLISECONDS)
+                .readTimeout(this.config.getHttpReadTimeout(), TimeUnit.MILLISECONDS)
+                .writeTimeout(this.config.getHttpWriteTimeout(), TimeUnit.MILLISECONDS)
                 .retryOnConnectionFailure(this.config.isRetryOnConnectionFailure());
-        if (this.config.isPrint() && loggingInterceptor != null) {
+        if (this.config.isHttpLogRequestData() && loggingInterceptor != null) {
             clientBuilder.addInterceptor(loggingInterceptor);
         }
         if(isNotEmpty(config.getApiKey())) {

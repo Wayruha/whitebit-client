@@ -6,8 +6,8 @@ import okhttp3.*;
 import okio.Buffer;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import trade.wayruha.whitebit.client.APIConstant;
-import trade.wayruha.whitebit.client.ClientConfig;
+import trade.wayruha.whitebit.APIConstant;
+import trade.wayruha.whitebit.ClientConfig;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -17,7 +17,7 @@ import java.util.Base64;
 import java.util.Formatter;
 
 import static java.lang.String.format;
-import static trade.wayruha.whitebit.client.APIConstant.*;
+import static trade.wayruha.whitebit.APIConstant.*;
 
 /**
  * A request interceptor that injects the API Key Header into requests and signs messages.

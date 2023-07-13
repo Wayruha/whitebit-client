@@ -6,12 +6,13 @@ import trade.wayruha.whitebit.ClientConfig;
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.client.ApiClient;
 import trade.wayruha.whitebit.domain.Market;
-import trade.wayruha.whitebit.dto.ws.OrderBookUpdate;
+import trade.wayruha.whitebit.dto.ws.*;
 
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static trade.wayruha.whitebit.ws.Constants.MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION;
 import static trade.wayruha.whitebit.ws.Constants.MAX_ORDER_BOOK_DEPTH;
 
 public class WSClientFactory {
@@ -30,6 +31,18 @@ public class WSClientFactory {
     this.objectMapper = ClientConfig.getObjectMapper();
   }
 
+
+  //public subscriptions
+
+  public WebSocketSubscriptionClient<LastPriceUpdate> lastPriceSubscription(Set<Market> market, WebSocketCallback<LastPriceUpdate> callback) {
+    final Set<Subscription> subscriptions = market.stream()
+        .map(m -> new Subscription("lastprice_subscribe", market.toArray()))
+        .collect(Collectors.toSet());
+    final WebSocketSubscriptionClient<LastPriceUpdate> client = new WebSocketSubscriptionClient<>(apiClient, objectMapper, callback, new LastPriceUpdate.Parser(objectMapper));
+    client.connect(subscriptions);
+    return client;
+  }
+
   public WebSocketSubscriptionClient<OrderBookUpdate> orderBookSubscription(Set<Market> market, int depth, BigDecimal priceInterval,
                                                                             boolean multipleSubs, WebSocketCallback<OrderBookUpdate> callback) {
     if (depth > MAX_ORDER_BOOK_DEPTH) throw new IllegalArgumentException("Max OrderBook Depth is " + MAX_ORDER_BOOK_DEPTH);
@@ -43,5 +56,34 @@ public class WSClientFactory {
 
   public WebSocketSubscriptionClient<OrderBookUpdate> orderBookSubscription(Set<Market> market, int depth, WebSocketCallback<OrderBookUpdate> callback) {
     return orderBookSubscription(market, depth, BigDecimal.ZERO, true, callback);
+  }
+
+  //private subscriptions
+  public WebSocketPrivateClient<SpotBalanceUpdate> spotBalanceSubscription(Set<String> assets, WebSocketCallback<SpotBalanceUpdate> callback) {
+    final Set<Subscription> subscriptions = assets.stream()
+        .map(m -> new Subscription("balanceSpot_subscribe", assets.toArray()))
+        .collect(Collectors.toSet());
+    final WebSocketPrivateClient<SpotBalanceUpdate> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new SpotBalanceUpdate.Parser(objectMapper));
+    client.connect(subscriptions);
+    return client;
+  }
+
+  public WebSocketPrivateClient<MarginBalanceUpdate> marginBalanceSubscription(Set<String> assets, WebSocketCallback<MarginBalanceUpdate> callback) {
+    final Set<Subscription> subscriptions = assets.stream()
+        .map(m -> new Subscription("balanceMargin_subscribe", assets.toArray()))
+        .collect(Collectors.toSet());
+    final WebSocketPrivateClient<MarginBalanceUpdate> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new MarginBalanceUpdate.Parser(objectMapper));
+    client.connect(subscriptions);
+    return client;
+  }
+
+  public WebSocketPrivateClient<PendingOrderUpdate> pendingOrdersSubscription(Set<Market> markets, WebSocketCallback<PendingOrderUpdate> callback) {
+    if (markets.size() > MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION) throw new IllegalArgumentException("Max markets count is " + MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION);
+    final Set<Subscription> subscriptions = markets.stream()
+        .map(m -> new Subscription("ordersPending_subscribe", markets.toArray()))
+        .collect(Collectors.toSet());
+    final WebSocketPrivateClient<PendingOrderUpdate> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new PendingOrderUpdate.Parser(objectMapper));
+    client.connect(subscriptions);
+    return client;
   }
 }

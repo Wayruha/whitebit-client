@@ -15,6 +15,7 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.WBConfig;
+import trade.wayruha.whitebit.utils.ModelParser;
 import trade.wayruha.whitebit.exception.WebSocketException;
 import trade.wayruha.whitebit.client.ApiClient;
 import trade.wayruha.whitebit.utils.IdGenerator;
@@ -37,26 +38,26 @@ import static trade.wayruha.whitebit.ws.Constants.*;
 public class WebSocketSubscriptionClient<T> extends WebSocketListener {
   protected static final WSRequest pingRequest = new WSRequest("ping");
 
-  private final WBConfig config;
-  private final ApiClient apiClient;
-  private final ObjectMapper objectMapper;
-  private final WebSocketCallback<T> callback;
-  private final ModelParser<T> modelParser;
+  protected final WBConfig config;
+  protected final ApiClient apiClient;
+  protected final ObjectMapper objectMapper;
+  protected final WebSocketCallback<T> callback;
+  protected final ModelParser<T> modelParser;
   @Getter
-  private final int id;
-  private final String logPrefix;
-  private final Set<Subscription> subscriptions;
+  protected final int id;
+  protected final String logPrefix;
+  protected final Set<Subscription> subscriptions;
 
   protected WebSocket webSocket;
   protected Request connectionRequest;
-  private final AtomicInteger reconnectionCounter;
+  protected final AtomicInteger reconnectionCounter;
   @Setter
   protected ScheduledExecutorService scheduler;
   protected ScheduledFuture<?> scheduledPingTask;
   @Getter
   protected WSState state;
   @Getter
-  private long lastReceivedTime;
+  protected long lastReceivedTime;
 
   public WebSocketSubscriptionClient(ApiClient apiClient, ObjectMapper mapper, WebSocketCallback<T> callback, ModelParser<T> modelParser) {
     this(apiClient, mapper, callback, modelParser, Executors.newSingleThreadScheduledExecutor());
@@ -76,7 +77,6 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     this.id = IdGenerator.getNextId();
     this.logPrefix = "[ws-" + this.id + "]";
   }
-
   protected void connect(Set<Subscription> subscriptions) {
     if (this.state != WSState.CONNECTED && this.state != WSState.CONNECTING) {
       log.debug("{} Connecting to channels {} ...", logPrefix, subscriptions);
@@ -88,11 +88,9 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     } else {
       log.warn("{} Already connected to channels {}", logPrefix, this.subscriptions);
     }
-    if (!subscriptions.isEmpty()) {
-      this.subscribe(subscriptions);
-    }
     this.scheduledPingTask = scheduler.scheduleAtFixedRate(new PingTask(), this.config.getWebSocketPingIntervalSec(), this.config.getWebSocketPingIntervalSec(), TimeUnit.SECONDS);
     reconnectionCounter.set(0); //reset reconnection indexer due to successful connection
+    this.subscribe(subscriptions);
   }
 
   @SneakyThrows

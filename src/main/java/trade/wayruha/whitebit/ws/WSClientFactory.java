@@ -118,4 +118,24 @@ public class WSClientFactory {
     client.connect(Set.of(subscription));
     return client;
   }
+
+  public WebSocketPrivateClient<Order> executedOrdersSubscription(Set<Market> markets, ExecutedOrdersFilter orderTypeFilter, WebSocketCallback<Order> callback) {
+    if (markets.size() > MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION) throw new IllegalArgumentException("Max markets count is " + MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION);
+    final Set<Subscription> subscriptions = markets.stream()
+        .map(m -> new Subscription("ordersExecuted_subscribe", markets.toArray(), orderTypeFilter))
+        .collect(Collectors.toSet());
+    final WebSocketPrivateClient<Order> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new ValueModelParser<>(objectMapper, Order.class));
+    client.connect(subscriptions);
+    return client;
+  }
+
+  public WebSocketPrivateClient<DealsUpdate> dealsSubscription(Set<Market> markets, WebSocketCallback<DealsUpdate> callback) {
+    if (markets.size() > MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION) throw new IllegalArgumentException("Max markets count is " + MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION);
+    final Set<Subscription> subscriptions = markets.stream()
+        .map(m -> new Subscription("deals_subscribe", List.of(markets.toArray())))
+        .collect(Collectors.toSet());
+    final WebSocketPrivateClient<DealsUpdate> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new DealsUpdate.Parser(objectMapper));
+    client.connect(subscriptions);
+    return client;
+  }
 }

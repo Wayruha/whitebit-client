@@ -23,9 +23,9 @@ public class Order {
   private BigDecimal filledQty;
   @JsonAlias({"dealMoney", "deal_money"})
   private BigDecimal filledTotal;
-  @JsonAlias("takerFee")
+  @JsonAlias({"takerFee", "taker_fee"})
   private BigDecimal takerFeeRatio;
-  @JsonAlias("makerFee")
+  @JsonAlias({"makerFee", "maker_fee"})
   private BigDecimal makerFeeRatio;
   @JsonAlias("left")
   private BigDecimal amountLeft;
@@ -37,9 +37,9 @@ public class Order {
   @JsonAlias({"timestamp", "ctime"})
   private long timestamp;
   @JsonAlias("mtime")
-  private Float modifiedTime;
+  private Double modifiedTime;
   @JsonAlias("ftime")
-  private Float finishTime;
+  private Double finishTime;
 
   public void setSide(String sideName) {
     this.side = OrderSide.fromName(sideName);

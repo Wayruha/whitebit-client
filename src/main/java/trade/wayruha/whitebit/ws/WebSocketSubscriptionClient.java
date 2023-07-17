@@ -109,9 +109,9 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
   @SneakyThrows
   public boolean sendRequest(WSRequest request) {
     boolean result = false;
-    log.debug("{} Try to send request {}", logPrefix, request);
     final String requestStr = objectMapper.writeValueAsString(request);
-    if (webSocket != null) {
+    log.debug("{} Try to send request {}", logPrefix, requestStr);
+    if (nonNull(webSocket)) {
       result = webSocket.send(requestStr);
     }
     if (!result) {

@@ -8,10 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
+import okhttp3.*;
 import okio.ByteString;
 import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.WBConfig;
@@ -29,6 +26,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static trade.wayruha.whitebit.APIConstant.WEBSOCKET_INTERRUPTED_EXCEPTION;
@@ -193,14 +191,14 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
         callback.onResponse(data);
       }
     } catch (Exception e) {
-      log.error("{} WS message parsing failed: {}. Response:{}", log, e, text);
+      log.error("{} WS message parsing failed. Response: {}", log, text, e);
       closeOnError(e);
     }
   }
 
   @Override
   public void onMessage(WebSocket webSocket, ByteString bytes) {
-    log.info("onMessage: {} " + bytes.toString());
+    log.debug("onMessage: {} " + bytes.toString());
     super.onMessage(webSocket, bytes);
   }
 
@@ -221,8 +219,7 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     if (state == WSState.IDLE) {
       return; //this is a handled websocket closure. No failure event should be created.
     }
-    final String responseBody = response.body() != null ? response.body().string() : null;
-    log.error("{} WS failed. Response: {}. Trying to reconnect...", logPrefix, responseBody, t);
+    log.error("{} WS failed. Response: {}. Trying to reconnect...", logPrefix, extractResponseBody(response), t);
 
     if (!reConnect()) {
       log.warn("{} [Connection error] Could not reconnect in {} attempts.", logPrefix, config.getWebSocketMaxReconnectAttempts());
@@ -258,6 +255,13 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
 
   static Request buildRequestFromHost(String host) {
     return new Request.Builder().url(host).build();
+  }
+
+  @SneakyThrows
+  static String extractResponseBody(Response response){
+    if(isNull(response)) return null;
+    if(isNull(response.body())) return null;
+    return response.body().string();
   }
 
   class PingTask implements Runnable {

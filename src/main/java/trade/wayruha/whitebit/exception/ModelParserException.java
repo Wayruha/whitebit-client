@@ -11,7 +11,7 @@ public class ModelParserException extends Exception {
   }
 
   public ModelParserException(ArrayNode node, Throwable cause) {
-    super(cause);
+    super("Can't parse: " + node, cause);
     this.node = node;
   }
 }

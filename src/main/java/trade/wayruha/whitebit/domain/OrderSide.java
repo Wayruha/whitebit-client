@@ -1,18 +1,29 @@
 package trade.wayruha.whitebit.domain;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.Arrays;
 
 public enum OrderSide {
-  BUY("buy"), SELL("sell");
+  SELL("sell", 1),
+  BUY("buy", 2);
 
   private final String name;
+  private final int code;
 
-  OrderSide(String name) {
+  OrderSide(String name, int id) {
     this.name = name;
+    this.code = id;
   }
 
-  @JsonValue
-  public String getName() {
-    return name;
+  public static OrderSide fromCode(int code) {
+    return Arrays.stream(values())
+        .filter(side -> side.code == code)
+        .findFirst().orElseThrow(() -> new IllegalArgumentException("Unknown OrderSide code:" + code));
+  }
+
+  public static OrderSide fromName(String name) {
+    return Arrays.stream(values())
+        .filter(side -> side.name.equalsIgnoreCase(name))
+        .findFirst().orElseThrow(() -> new IllegalArgumentException("Unknown OrderSide name:" + name));
   }
 }

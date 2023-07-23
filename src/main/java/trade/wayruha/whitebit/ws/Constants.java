@@ -4,6 +4,7 @@ class Constants {
     public static long WEB_SOCKET_RECONNECTION_DELAY_MS = 10_000;
 
     static final int MAX_ORDER_BOOK_DEPTH = 100;
+    static final int MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION = 100;
     static final String WS_ERROR_PARAM = "error";
     static final String WS_RESULT_PARAM = "result";
     static final String WS_STATUS_PARAM = "status";

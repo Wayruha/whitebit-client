@@ -8,13 +8,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
+import okhttp3.*;
 import okio.ByteString;
 import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.WBConfig;
+import trade.wayruha.whitebit.utils.ModelParser;
 import trade.wayruha.whitebit.exception.WebSocketException;
 import trade.wayruha.whitebit.client.ApiClient;
 import trade.wayruha.whitebit.utils.IdGenerator;
@@ -28,6 +26,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static trade.wayruha.whitebit.APIConstant.WEBSOCKET_INTERRUPTED_EXCEPTION;
@@ -37,26 +36,26 @@ import static trade.wayruha.whitebit.ws.Constants.*;
 public class WebSocketSubscriptionClient<T> extends WebSocketListener {
   protected static final WSRequest pingRequest = new WSRequest("ping");
 
-  private final WBConfig config;
-  private final ApiClient apiClient;
-  private final ObjectMapper objectMapper;
-  private final WebSocketCallback<T> callback;
-  private final ModelParser<T> modelParser;
+  protected final WBConfig config;
+  protected final ApiClient apiClient;
+  protected final ObjectMapper objectMapper;
+  protected final WebSocketCallback<T> callback;
+  protected final ModelParser<T> modelParser;
   @Getter
-  private final int id;
-  private final String logPrefix;
-  private final Set<Subscription> subscriptions;
+  protected final int id;
+  protected final String logPrefix;
+  protected final Set<Subscription> subscriptions;
 
   protected WebSocket webSocket;
   protected Request connectionRequest;
-  private final AtomicInteger reconnectionCounter;
+  protected final AtomicInteger reconnectionCounter;
   @Setter
   protected ScheduledExecutorService scheduler;
   protected ScheduledFuture<?> scheduledPingTask;
   @Getter
   protected WSState state;
   @Getter
-  private long lastReceivedTime;
+  protected long lastReceivedTime;
 
   public WebSocketSubscriptionClient(ApiClient apiClient, ObjectMapper mapper, WebSocketCallback<T> callback, ModelParser<T> modelParser) {
     this(apiClient, mapper, callback, modelParser, Executors.newSingleThreadScheduledExecutor());
@@ -76,7 +75,6 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     this.id = IdGenerator.getNextId();
     this.logPrefix = "[ws-" + this.id + "]";
   }
-
   protected void connect(Set<Subscription> subscriptions) {
     if (this.state != WSState.CONNECTED && this.state != WSState.CONNECTING) {
       log.debug("{} Connecting to channels {} ...", logPrefix, subscriptions);
@@ -88,11 +86,9 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     } else {
       log.warn("{} Already connected to channels {}", logPrefix, this.subscriptions);
     }
-    if (!subscriptions.isEmpty()) {
-      this.subscribe(subscriptions);
-    }
     this.scheduledPingTask = scheduler.scheduleAtFixedRate(new PingTask(), this.config.getWebSocketPingIntervalSec(), this.config.getWebSocketPingIntervalSec(), TimeUnit.SECONDS);
     reconnectionCounter.set(0); //reset reconnection indexer due to successful connection
+    this.subscribe(subscriptions);
   }
 
   @SneakyThrows
@@ -111,9 +107,9 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
   @SneakyThrows
   public boolean sendRequest(WSRequest request) {
     boolean result = false;
-    log.debug("{} Try to send request {}", logPrefix, request);
     final String requestStr = objectMapper.writeValueAsString(request);
-    if (webSocket != null) {
+    log.debug("{} Try to send request {}", logPrefix, requestStr);
+    if (nonNull(webSocket)) {
       result = webSocket.send(requestStr);
     }
     if (!result) {
@@ -195,14 +191,14 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
         callback.onResponse(data);
       }
     } catch (Exception e) {
-      log.error("{} WS message parsing failed: {}. Response:{}", log, e, text);
+      log.error("{} WS message parsing failed. Response: {}", log, text, e);
       closeOnError(e);
     }
   }
 
   @Override
   public void onMessage(WebSocket webSocket, ByteString bytes) {
-    log.info("onMessage: {} " + bytes.toString());
+    log.debug("onMessage: {} " + bytes.toString());
     super.onMessage(webSocket, bytes);
   }
 
@@ -223,8 +219,7 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     if (state == WSState.IDLE) {
       return; //this is a handled websocket closure. No failure event should be created.
     }
-    final String responseBody = response.body() != null ? response.body().string() : null;
-    log.error("{} WS failed. Response: {}. Trying to reconnect...", logPrefix, responseBody, t);
+    log.error("{} WS failed. Response: {}. Trying to reconnect...", logPrefix, extractResponseBody(response), t);
 
     if (!reConnect()) {
       log.warn("{} [Connection error] Could not reconnect in {} attempts.", logPrefix, config.getWebSocketMaxReconnectAttempts());
@@ -260,6 +255,13 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
 
   static Request buildRequestFromHost(String host) {
     return new Request.Builder().url(host).build();
+  }
+
+  @SneakyThrows
+  static String extractResponseBody(Response response){
+    if(isNull(response)) return null;
+    if(isNull(response.body())) return null;
+    return response.body().string();
   }
 
   class PingTask implements Runnable {

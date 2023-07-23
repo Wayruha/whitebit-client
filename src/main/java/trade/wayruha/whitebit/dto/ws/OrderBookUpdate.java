@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import trade.wayruha.whitebit.domain.Market;
 import trade.wayruha.whitebit.dto.OrderBook;
-import trade.wayruha.whitebit.ws.ModelParser;
+import trade.wayruha.whitebit.utils.ModelParser;
 import trade.wayruha.whitebit.exception.ModelParserException;
 
 @Data

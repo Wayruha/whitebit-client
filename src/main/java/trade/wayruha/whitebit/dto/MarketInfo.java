@@ -2,7 +2,7 @@ package trade.wayruha.whitebit.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
-import trade.wayruha.whitebit.domain.MarketType;
+import trade.wayruha.whitebit.domain.enums.MarketType;
 
 import java.math.BigDecimal;
 

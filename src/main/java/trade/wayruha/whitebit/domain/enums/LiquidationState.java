@@ -1,14 +1,14 @@
-package trade.wayruha.whitebit.domain;
+package trade.wayruha.whitebit.domain.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum MarketType {
-  SPOT("spot"),
-  FUTURES("futures");
+public enum LiquidationState {
+  MARGIN_CALL("margin_call"),
+  LIQUIDATION("liquidation");
 
   private final String name;
 
-  MarketType(String name) {
+  LiquidationState(String name) {
     this.name = name;
   }
 

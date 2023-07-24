@@ -6,7 +6,7 @@ import trade.wayruha.whitebit.ClientConfig;
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.client.ApiClient;
 import trade.wayruha.whitebit.domain.Market;
-import trade.wayruha.whitebit.dto.Order;
+import trade.wayruha.whitebit.domain.Order;
 import trade.wayruha.whitebit.dto.request.ExecutedOrdersFilter;
 import trade.wayruha.whitebit.dto.ws.*;
 import trade.wayruha.whitebit.utils.ValueModelParser;
@@ -99,22 +99,6 @@ public class WSClientFactory {
     if (markets.size() > MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION) throw new IllegalArgumentException("Max markets count is " + MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION);
     final Subscription subscription = new Subscription("ordersPending_subscribe", markets.toArray());
     final WebSocketPrivateClient<PendingOrderUpdate> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new PendingOrderUpdate.Parser(objectMapper));
-    client.connect(Set.of(subscription));
-    return client;
-  }
-
-  public WebSocketPrivateClient<Order> executedOrdersSubscription(Set<Market> markets, ExecutedOrdersFilter orderTypeFilter, WebSocketCallback<Order> callback) {
-    if (markets.size() > MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION) throw new IllegalArgumentException("Max markets count is " + MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION);
-    final Subscription subscription = new Subscription("ordersExecuted_subscribe", markets.toArray(), orderTypeFilter);
-    final WebSocketPrivateClient<Order> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new ValueModelParser<>(objectMapper, Order.class));
-    client.connect(Set.of(subscription));
-    return client;
-  }
-
-  public WebSocketPrivateClient<DealsUpdate> dealsSubscription(Set<Market> markets, WebSocketCallback<DealsUpdate> callback) {
-    if (markets.size() > MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION) throw new IllegalArgumentException("Max markets count is " + MAX_MARKETS_FOR_PENDING_ORDERS_SUBSCRIPTION);
-    final Subscription subscription = new Subscription("deals_subscribe", List.of(markets.toArray()));
-    final WebSocketPrivateClient<DealsUpdate> client = new WebSocketPrivateClient<>(apiClient, objectMapper, callback, new DealsUpdate.Parser(objectMapper));
     client.connect(Set.of(subscription));
     return client;
   }

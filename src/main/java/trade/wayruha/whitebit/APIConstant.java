@@ -1,5 +1,8 @@
 package trade.wayruha.whitebit;
 
+import java.util.List;
+import java.util.Set;
+
 public class APIConstant {
   /**
    * The default timeout is 30 seconds.
@@ -27,5 +30,8 @@ public class APIConstant {
   public static final String CRYPTO_HMAC_SHA512 = "HmacSHA512";
 
   public static final int MAX_WS_BATCH_SUBSCRIPTIONS = 1000;
+  public static final int FETCH_ORDERS_MAX_LIMIT = 100;
+  public static final int FETCH_ORDERS_MAX_OFFSET = 10000;
 
+  public static final Set<Integer> MARGIN_LEVERAGE_ACCEPTABLE_VALUES = Set.of(1, 2, 3, 5, 10, 20, 50, 100);
 }

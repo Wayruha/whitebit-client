@@ -15,21 +15,13 @@ public class TickerService extends ServiceBase {
     this.api = createService(TickerEndpoint.class);
   }
 
-  public List<MarketActivity> getMarketActivity() {
-    V1Response<List<MarketActivity>> response  =  client.executeSync(api.getMarketActivity()).getData();
+  public Map<String, SingleTicker>  getAvailableTickers() {
+    V1Response<Map<String, SingleTicker>> response = client.executeSync(api.getAvailableTickers()).getData();
     return response.getResult();
   }
 
-  public SingleMarketActivity getSingleMarketActivity(String symbol) {
-    V1Response<SingleMarketActivity> response = client.executeSync(api.getSingleMarketActivity(symbol)).getData();
-    return response.getResult();
-  }
-  public Map<String, AvailableTicker> getAvailableTickers() {
-    return client.executeSync(api.getAvailableTickers()).getData();
-  }
-
-  public Map<String, SingleTicker> getTickers() {
-    V1Response<Map<String, SingleTicker>> response = client.executeSync(api.getTickers()).getData();
+  public SingleMarketActivity getAvailableTicker(String symbol) {
+    V1Response<SingleMarketActivity> response = client.executeSync(api.getAvailableTicker(symbol)).getData();
     return response.getResult();
   }
 }

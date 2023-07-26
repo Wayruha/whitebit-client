@@ -16,21 +16,23 @@ public class TickerServiceTest {
 
   @Test
   public void test_getMarketActivity(){
-    final  List<MarketActivity>  marketActivityList = service.getMarketActivity();
-    assertNotNull(marketActivityList);
-    assertTrue(marketActivityList.size() > 10);
-    MarketActivity listEntity = marketActivityList.get(0);
-    assertNotNull(listEntity.getBaseVolume24h());
-    assertNotNull(listEntity.getHighestBid());
-    assertNotNull(listEntity.getLowestAsk());
-    assertNotNull(listEntity.getQuoteVolume24h());
-    assertNotNull(listEntity.getLastPrice());
-    assertNotNull(listEntity.getLastUpdateTimestamp());
+    Map<String, SingleTicker> response = service.getAvailableTickers();
+    assertNotNull(response);
+
+    SingleTicker ticker = response.get("1INCH_BTC");
+    assertNotNull(ticker.getAt());
+    assertNotNull(ticker.getTicker());
+
+    SingleMarketActivity marketActivity = ticker.getTicker();
+
+    assertNotNull(marketActivity.getAsk());
+    assertNotNull(marketActivity.getBid());
+    assertNotNull(marketActivity.getLow());
   }
 
   @Test
   public void test_getSingleMarketActivity(){
-    SingleMarketActivity response = service.getSingleMarketActivity("ETH_BTC");
+    SingleMarketActivity response = service.getAvailableTicker("ETH_BTC");
     assertNotNull(response);
 
     assertNotNull(response.getOpen());
@@ -44,29 +46,7 @@ public class TickerServiceTest {
     assertNotNull(response.getChange());
   }
 
-  @Test
-  public void test_getAvailableTickers() {
-    Map<String, AvailableTicker> response = service.getAvailableTickers();
-    assertNotNull(response);
 
-    AvailableTicker ticker = response.get("1INCH_BTC");
-    assertNotNull(ticker);
-    assertNotNull(ticker.getBaseVolume());
-  }
 
-  @Test
-  public void test_getTickers() {
-    Map<String, SingleTicker> response = service.getTickers();
-    assertNotNull(response);
 
-    SingleTicker ticker = response.get("1INCH_BTC");
-    assertNotNull(ticker.getAt());
-    assertNotNull(ticker.getTicker());
-
-    SingleMarketActivity marketActivity = ticker.getTicker();
-
-    assertNotNull(marketActivity.getAsk());
-    assertNotNull(marketActivity.getBid());
-    assertNotNull(marketActivity.getLow());
-  }
 }

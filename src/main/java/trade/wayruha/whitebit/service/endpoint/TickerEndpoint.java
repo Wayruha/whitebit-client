@@ -9,15 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface TickerEndpoint {
-    @GET("/api/v2/public/ticker")
-    Call<V1Response<List<MarketActivity>>> getMarketActivity();
-
     @GET("/api/v1/public/ticker")
-    Call<V1Response<SingleMarketActivity>> getSingleMarketActivity(@Query("market") String symbol);
-
-    @GET("/api/v4/public/ticker")
-    Call<Map<String, AvailableTicker>> getAvailableTickers();
+    Call<V1Response<SingleMarketActivity>> getAvailableTicker(@Query("market") String symbol);
 
     @GET("/api/v1/public/tickers")
-    Call<V1Response<Map<String, SingleTicker>>> getTickers();
+    Call<V1Response<Map<String, SingleTicker>>> getAvailableTickers();
 }

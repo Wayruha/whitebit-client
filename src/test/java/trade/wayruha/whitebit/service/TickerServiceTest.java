@@ -3,6 +3,7 @@ package trade.wayruha.whitebit.service;
 import org.junit.Test;
 import trade.wayruha.whitebit.TestConstants;
 import trade.wayruha.whitebit.WBConfig;
+import trade.wayruha.whitebit.domain.Market;
 import trade.wayruha.whitebit.dto.*;
 
 import java.util.List;
@@ -12,18 +13,21 @@ import static org.junit.Assert.*;
 
 public class TickerServiceTest {
   WBConfig config = TestConstants.getSimpleConfig();
-  TickerService service = new TickerService(config);
+  TickerServiceV1 service = new TickerServiceV1(config);
+  TickerServiceV2 serviceV2 = new TickerServiceV2(config);
+  TickerServiceV4 serviceV4 = new TickerServiceV4(config);
+  final Market symbol = Market.parse("1INCH_BTC");
 
   @Test
   public void test_getMarketActivity(){
-    Map<String, SingleTicker> response = service.getAvailableTickers();
+    Map<Market, MarketActivityV1> response = service.getAvailableTickers();
     assertNotNull(response);
 
-    SingleTicker ticker = response.get("1INCH_BTC");
+    MarketActivityV1 ticker = response.get(symbol);
     assertNotNull(ticker.getAt());
     assertNotNull(ticker.getTicker());
 
-    SingleMarketActivity marketActivity = ticker.getTicker();
+    MarketActivityV1.Ticker marketActivity = ticker.getTicker();
 
     assertNotNull(marketActivity.getAsk());
     assertNotNull(marketActivity.getBid());
@@ -32,7 +36,7 @@ public class TickerServiceTest {
 
   @Test
   public void test_getSingleMarketActivity(){
-    SingleMarketActivity response = service.getAvailableTicker("ETH_BTC");
+    MarketActivityV1.Ticker response = service.getAvailableTicker(Market.parse("ETH_BTC"));
     assertNotNull(response);
 
     assertNotNull(response.getOpen());
@@ -46,7 +50,42 @@ public class TickerServiceTest {
     assertNotNull(response.getChange());
   }
 
+  //V2
+  @Test
+  public void test_getAvailableTickersV2() {
+    final  List<MarketActivity>  marketActivityList = serviceV2.getAvailableTickers();
+    assertNotNull(marketActivityList);
+    assertTrue(marketActivityList.size() > 10);
+    MarketActivity listEntity = marketActivityList.get(0);
+    assertNotNull(listEntity.getBaseVolume24h());
+    assertNotNull(listEntity.getHighestBid());
+    assertNotNull(listEntity.getLowestAsk());
+    assertNotNull(listEntity.getQuoteVolume24h());
+    assertNotNull(listEntity.getLastPrice());
+    assertNotNull(listEntity.getLastUpdateTimestamp());
+  }
 
+  @Test
+  public void test_getAvailableTickerV2() {
+    MarketActivity ticker = serviceV2.getAvailableTicker(symbol);
+    assertNotNull(ticker);
+    assertNotNull(ticker.getLastPrice());
+  }
 
+  //V4
+  @Test
+  public void test_getAvailableTickers() {
+    Map<Market, MarketActivityV4> response = serviceV4.getAvailableTickers();
+    assertNotNull(response);
+    MarketActivityV4 ticker = response.get(symbol);
+    assertNotNull(ticker);
+    assertNotNull(ticker.getBaseVolume());
+  }
 
+  @Test
+  public void test_getAvailableTicker() {
+    MarketActivityV4 ticker = serviceV4.getAvailableTicker(symbol);
+    assertNotNull(ticker);
+    assertNotNull(ticker.getBaseVolume());
+  }
 }

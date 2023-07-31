@@ -2,6 +2,7 @@ package trade.wayruha.whitebit.service;
 
 import org.jetbrains.annotations.Nullable;
 import trade.wayruha.whitebit.WBConfig;
+import trade.wayruha.whitebit.domain.Market;
 import trade.wayruha.whitebit.dto.MarketInfo;
 import trade.wayruha.whitebit.dto.OrderBook;
 import trade.wayruha.whitebit.service.endpoint.MarketDataEndpoint;
@@ -24,7 +25,7 @@ public class MarketDataService extends ServiceBase {
     return client.executeSync(api.getMarkets()).getData();
   }
 
-  public OrderBook getOrderBook(String symbol, @Nullable Integer depth, @Nullable Integer aggregationLevel) {
+  public OrderBook getOrderBook(Market symbol, @Nullable Integer depth, @Nullable Integer aggregationLevel) {
     return client.executeSync(api.getOrderBook(symbol, depth, aggregationLevel)).getData();
   }
 }

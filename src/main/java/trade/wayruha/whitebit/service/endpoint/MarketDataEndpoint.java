@@ -4,6 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import trade.wayruha.whitebit.domain.Market;
 import trade.wayruha.whitebit.dto.ValueWrapper;
 import trade.wayruha.whitebit.dto.MarketInfo;
 import trade.wayruha.whitebit.dto.OrderBook;
@@ -28,5 +29,5 @@ public interface MarketDataEndpoint {
    * rate limit: 600 requests/10sec
    */
   @GET("/api/v4/public/orderbook/{market}")
-  Call<OrderBook> getOrderBook(@Path("market") String symbol, @Query("limit") Integer depth, @Query("level") Integer aggregationLevel);
+  Call<OrderBook> getOrderBook(@Path("market") Market symbol, @Query("limit") Integer depth, @Query("level") Integer aggregationLevel);
 }

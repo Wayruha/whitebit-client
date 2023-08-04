@@ -15,12 +15,12 @@ public enum OrderType {
   LIMIT(1, "limit"),
   MARKET(2, "market"),
   MARKET_STOCK(202, "stock market"),
-  STOP_LIMIT(3),
-  STOP_MARKET(4),
-  MARGIN_LIMIT(7),
+  STOP_LIMIT(3, "stop limit"),
+  STOP_MARKET(4, "stop market"),
+  MARGIN_LIMIT(7, "margin limit"),
   MARGIN_MARKET(8, "margin market"),
-  MARGIN_STOP_LIMIT(9),
-  MARGIN_TRIGGER_STOP_MARKET(10),
+  MARGIN_STOP_LIMIT(9, "margin stop limit"),
+  MARGIN_STOP_MARKET(10, "trigger margin market"),
   MARGIN_NORMALIZATION(14, "normalization");
 
   private final int code;

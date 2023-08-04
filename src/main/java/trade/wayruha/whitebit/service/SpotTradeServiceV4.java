@@ -3,17 +3,17 @@ package trade.wayruha.whitebit.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import trade.wayruha.whitebit.ClientConfig;
 import trade.wayruha.whitebit.WBConfig;
-import trade.wayruha.whitebit.domain.Deal;
-import trade.wayruha.whitebit.domain.Market;
-import trade.wayruha.whitebit.domain.Order;
-import trade.wayruha.whitebit.domain.OrderID;
+import trade.wayruha.whitebit.domain.*;
 import trade.wayruha.whitebit.dto.KillSwitchStatus;
 import trade.wayruha.whitebit.dto.OrderCreationStatus;
 import trade.wayruha.whitebit.dto.OrderDealsResponse;
 import trade.wayruha.whitebit.dto.request.*;
-import trade.wayruha.whitebit.service.endpoint.SpotTradeEndpoint;
+import trade.wayruha.whitebit.exception.WBCloudException;
+import trade.wayruha.whitebit.service.endpoint.OrdersEndpoint;
+import trade.wayruha.whitebit.service.endpoint.TradeEndpoint;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,72 +21,70 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static trade.wayruha.whitebit.APIConstant.FETCH_ORDERS_MAX_LIMIT;
-import static trade.wayruha.whitebit.APIConstant.FETCH_ORDERS_MAX_OFFSET;
+import static trade.wayruha.whitebit.APIConstant.*;
 
 public class SpotTradeServiceV4 extends ServiceBase {
   private static final TypeReference<Map<Market, List<Deal>>> marketDealsTypeRef = new TypeReference<>() {};
   private static final TypeReference<Map<Market, List<Order>>> marketOrdersTypeRef = new TypeReference<>() {};
-  private final SpotTradeEndpoint api;
+  private final TradeEndpoint tradeApi;
+  private final OrdersEndpoint ordersApi;
   private final ObjectMapper mapper = ClientConfig.getObjectMapper();
 
   public SpotTradeServiceV4(WBConfig config) {
     super(config);
-    this.api = createService(SpotTradeEndpoint.class);
+    this.ordersApi = createService(OrdersEndpoint.class);
+    this.tradeApi = createService(TradeEndpoint.class);
   }
 
-  public Order createOrder(NewOrderRequest o) {
-    final NewOrderRequest req;
-    switch (o.getOrderType()) {
+  public Order createOrder(NewOrderRequest req) {
+    switch (req.getOrderType()) {
       case LIMIT:
-        req = NewOrderRequest.limitOrder(o.getMarket(), o.getSide(), o.getBaseQty(), o.getPrice(), o.getClientOrderId(),
-            o.getPostOnly(), o.getIoc());
-        return client.executeSync(api.createLimitOrder(req)).getData();
+        return client.executeSync(tradeApi.createLimitOrder(req)).getData();
       case MARKET:
-        if (nonNull(o.getBaseQty())) {
-          req = NewOrderRequest.marketOrderBaseAsset(o.getMarket(), o.getSide(), o.getBaseQty(), o.getClientOrderId());
-          return client.executeSync(api.createStockMarketOrder(req)).getData();
-        }
-        req = NewOrderRequest.marketOrderQuoteAsset(o.getMarket(), o.getSide(), o.getQuoteQty(), o.getClientOrderId());
-        return client.executeSync(api.createMarketOrder(req)).getData();
+        return client.executeSync(tradeApi.createMarketOrder(req)).getData();
+      case MARKET_STOCK:
+        return client.executeSync(tradeApi.createStockMarketOrder(req)).getData();
       default:
-        throw new IllegalArgumentException("Unexpected order type: " + o.getOrderType());
+        throw new IllegalArgumentException("Unexpected order type: " + req.getOrderType());
     }
   }
 
-  public Order createStopOrder(StopOrderRequest o) {
-    final StopOrderRequest req;
-    switch (o.getOrderType()) {
+  public StopOrder createStopOrder(StopOrderRequest req) {
+    switch (req.getOrderType()) {
       case STOP_LIMIT:
-        req = StopOrderRequest.stopLimitOrder(o.getMarket(), o.getSide(), o.getBaseQty(), o.getPrice(), o.getActivationPrice(), o.getClientOrderId());
-        return client.executeSync(api.createStopLimitOrder(req)).getData();
+        return client.executeSync(tradeApi.createStopLimitOrder(req)).getData();
       case STOP_MARKET:
-        req = StopOrderRequest.stopMarketOrder(o.getMarket(), o.getSide(), o.getBaseQty(), o.getActivationPrice(), o.getClientOrderId());
-        return client.executeSync(api.createStopMarketOrder(req)).getData();
+        return client.executeSync(tradeApi.createStopMarketOrder(req)).getData();
       default:
-        throw new IllegalArgumentException("Unexpected order type: " + o.getOrderType());
+        throw new IllegalArgumentException("Unexpected order type: " + req.getOrderType());
     }
   }
 
   public List<OrderCreationStatus> createBulkLimitOrders(List<NewOrderRequest> orders, boolean stopOnFail) {
-    orders.forEach(order -> requireNonNull(order.getBaseQty()));
+    orders.forEach(order -> requireNonNull(order.getAmount()));
     final BulkOrdersCreation req = new BulkOrdersCreation(orders, stopOnFail);
-    return client.executeSync(api.createBulkLimitOrders(req)).getData();
+    return client.executeSync(tradeApi.createBulkLimitOrders(req)).getData();
   }
 
   public Order cancelOrder(OrderID orderId) {
-    return client.executeSync(api.cancelOrder(orderId)).getData();
+    return client.executeSync(ordersApi.cancelOrder(orderId)).getData();
   }
 
   public List<Order> getOpenOrders(OrderDetailsRequest request) {
     requireNonNull(request.getMarket(), "Market is required");
     validateLimitAndOffset(request.getLimit(), request.getOffset());
-    return client.executeSync(api.getActiveOrders(request)).getData();
+    try {
+      return client.executeSync(ordersApi.getActiveOrders(request)).getData();
+    } catch (WBCloudException ex){
+      if(StringUtils.isNotEmpty(ex.getMessage()) && ex.getMessage().contains(ORDER_NOT_FOUND_ERROR_MSG))
+        return List.of();
+      throw ex;
+    }
   }
 
   public Map<Market, List<Order>> getOrdersHistory(OrderDetailsRequest request) {
     validateLimitAndOffset(request.getLimit(), request.getOffset());
-    final JsonNode data = client.executeSync(api.getExecutedOrders(request)).getData();
+    final JsonNode data = client.executeSync(ordersApi.getExecutedOrders(request)).getData();
     if (data.isArray() && data.size() == 0) return new HashMap<>();
 
     final Map<Market, List<Order>> ordersMap = mapper.convertValue(data, marketOrdersTypeRef);
@@ -96,12 +94,12 @@ public class SpotTradeServiceV4 extends ServiceBase {
 
   public List<Deal> getDealsHistory(MarketFilter request) {
     validateLimitAndOffset(request.getLimit(), request.getOffset());
-    return client.executeSync(api.dealsHistory(request)).getData();
+    return client.executeSync(ordersApi.dealsHistory(request)).getData();
   }
 
   public Map<Market, List<Deal>> getDealsHistory(DealsRequest request) {
     validateLimitAndOffset(request.getLimit(), request.getOffset());
-    final JsonNode data = client.executeSync(api.dealsHistory(request)).getData();
+    final JsonNode data = client.executeSync(ordersApi.dealsHistory(request)).getData();
     if (data.isArray() && data.size() == 0) return new HashMap<>();
 
     return mapper.convertValue(data, marketDealsTypeRef);
@@ -109,21 +107,21 @@ public class SpotTradeServiceV4 extends ServiceBase {
 
   public OrderDealsResponse getOrderDeals(OrderDealsRequest request) {
     validateLimitAndOffset(request.getLimit(), request.getOffset());
-    return client.executeSync(api.getOrderDeals(request)).getData();
+    return client.executeSync(ordersApi.getOrderDeals(request)).getData();
   }
 
   public KillSwitchStatus createKillSwitch(KillSwitchRequest request) {
-    return client.executeSync(api.createKillSwitch(request)).getData();
+    return client.executeSync(tradeApi.createKillSwitch(request)).getData();
   }
 
   public KillSwitchStatus deleteKillSwitch(Market market) {
     final KillSwitchRequest req = new KillSwitchRequest(market, null);
-    return client.executeSync(api.createKillSwitch(req)).getData();
+    return client.executeSync(tradeApi.createKillSwitch(req)).getData();
   }
 
   public List<KillSwitchStatus> getKillSwitchStatus(Market market) {
     final MarketParameter req = new MarketParameter(market);
-    return client.executeSync(api.getKillSwitchStatus(req)).getData();
+    return client.executeSync(tradeApi.getKillSwitchStatus(req)).getData();
   }
 
   private static void populateMarket(Map<Market, List<Order>> marketOrderMap) {

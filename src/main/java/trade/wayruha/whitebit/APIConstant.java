@@ -15,6 +15,7 @@ public class APIConstant {
   public static final int DEFAULT_RECEIVING_WINDOW = 60_000;
   public static final String WEBSOCKET_INTERRUPTED_EXCEPTION = "The server terminated the connection for an unknown reason";
   public static final String API_CLIENT_ERROR_MESSAGE_PARSE_EXCEPTION = "Can't parse error message";
+  public static final String ORDER_NOT_FOUND_ERROR_MSG = "OrderHistory was not found";
 
   public static final String ENDPOINT_SECURITY_SIGNED = "API_SIGNED";
   public static final String ENDPOINT_SECURITY_SIGNED_HEADER = ENDPOINT_SECURITY_SIGNED + ": #";

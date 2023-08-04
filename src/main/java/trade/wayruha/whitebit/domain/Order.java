@@ -33,8 +33,6 @@ public class Order {
   private BigDecimal amountLeft;
   @JsonAlias({"dealFee", "deal_fee", "fee"})
   private BigDecimal quoteFee;
-  @JsonAlias({"activation_price"})
-  private BigDecimal activationPrice;
   @JsonAlias({"postOnly", "post_only"})
   private Boolean postOnly;  // orders are guaranteed to be the maker order when executed.
   private Boolean ioc;

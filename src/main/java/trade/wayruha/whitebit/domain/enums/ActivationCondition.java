@@ -3,7 +3,8 @@ package trade.wayruha.whitebit.domain.enums;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ActivationCondition {
-  GTE("gte");
+  GTE("gte"),
+  LTE("lte");
 
   private final String name;
 

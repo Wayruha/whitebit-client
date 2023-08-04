@@ -1,9 +1,12 @@
 package trade.wayruha.whitebit.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import trade.wayruha.whitebit.domain.enums.LiquidationState;
 
 import java.math.BigDecimal;
+
+import static java.util.Objects.nonNull;
 
 /**
  * NOTE: In case of position opening using trigger or limit order you can get situation
@@ -25,13 +28,20 @@ public class MarginPosition {
   private BigDecimal freeMargin; // free funds for trading according to
   private BigDecimal funding; // funding that will be paid on next position stage change (order, liquidation, etc)
   private BigDecimal unrealizedFunding; // funding that will be paid on next position stage change (order, liquidation, etc)
+  private BigDecimal realizedFunding;
   private Double openDate;
   private Double modifyDate;
-  private Order orderDetails; // details of order which changes position
+  private Order orderDetail; // details of order which changes position
 
+  public boolean isExecuted(){
+    return nonNull(basePrice) && nonNull(liquidationPrice);
+  }
+
+  @Data
   public static class Order {
     private long id;
     private BigDecimal tradeAmount;
+    @JsonAlias({"basePrice", "price"})
     private BigDecimal basePrice;
     private BigDecimal tradeFee;
     private BigDecimal fundingFee; // funding fee which was captured by this position change (order)

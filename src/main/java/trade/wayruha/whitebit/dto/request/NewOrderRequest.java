@@ -24,40 +24,46 @@ public class NewOrderRequest {
   private String clientOrderId;
   private Boolean postOnly;
   private Boolean ioc;
-  @JsonIgnore
-  private OrderType orderType;
-  @JsonIgnore
-  private BigDecimal baseQty;
-  @JsonIgnore
-  private BigDecimal quoteQty;
 
   /** amount refers to base asset for LIMIT BUY/SELL and MARKET SELL. For MARKET BUY orders, amount refers to quote asset   */
-  public BigDecimal getAmount() {
-    return nonNull(baseQty) ? baseQty : quoteQty;
-  }
+  private BigDecimal amount;
+  @JsonIgnore
+  private OrderType orderType;
 
   public static NewOrderRequest marketOrderBaseAsset(Market market, OrderSide side, BigDecimal baseQty, String clientOrderId) {
     return NewOrderRequest.builder()
-        .orderType(OrderType.MARKET).market(market).side(side).baseQty(baseQty).clientOrderId(clientOrderId)
+        .orderType(OrderType.MARKET_STOCK).market(market).side(side).amount(baseQty).clientOrderId(clientOrderId)
         .build();
   }
 
-  public static NewOrderRequest marketOrderQuoteAsset(Market market, OrderSide side, BigDecimal quoteQty, String clientOrderId) {
+  public static NewOrderRequest marketOrder(Market market, OrderSide side, BigDecimal amount, String clientOrderId) {
     return NewOrderRequest.builder()
-        .orderType(OrderType.MARKET).market(market).side(side).quoteQty(quoteQty).clientOrderId(clientOrderId)
+        .orderType(OrderType.MARKET).market(market).side(side).amount(amount).clientOrderId(clientOrderId)
         .build();
   }
 
   public static NewOrderRequest limitOrder(Market market, OrderSide side, BigDecimal baseQty, BigDecimal price,
                                               String clientOrderId, Boolean postOnly, Boolean ioc) {
     return NewOrderRequest.builder()
-        .orderType(OrderType.LIMIT).market(market).side(side).baseQty(baseQty).price(price).clientOrderId(clientOrderId)
+        .orderType(OrderType.LIMIT).market(market).side(side).amount(baseQty).price(price).clientOrderId(clientOrderId)
         .postOnly(postOnly).ioc(ioc)
         .build();
   }
 
   public static NewOrderRequest limitOrder(Market market, OrderSide side, BigDecimal baseQty, BigDecimal price) {
     return limitOrder(market, side, baseQty, price, null, null, null);
+  }
+
+  public static NewOrderRequest marginLimitOrder(Market market, OrderSide side, BigDecimal baseQty, BigDecimal price) {
+    final NewOrderRequest req = limitOrder(market, side, baseQty, price, null, null, null);
+    req.setOrderType(OrderType.MARGIN_LIMIT);
+    return req;
+  }
+
+  public static NewOrderRequest marginMarketOrder(Market market, OrderSide side, BigDecimal baseQty, String clientOrderId) {
+    final NewOrderRequest req = marketOrder(market, side, baseQty, clientOrderId);
+    req.setOrderType(OrderType.MARGIN_MARKET);
+    return req;
   }
 }
 

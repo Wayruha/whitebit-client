@@ -3,6 +3,7 @@ package trade.wayruha.whitebit.domain;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -17,7 +18,7 @@ import static java.util.Objects.nonNull;
 
 @Value
 @JsonSerialize(using = Market.Serializer.class)
-@JsonDeserialize(using = Market.Deserializer.class)
+@JsonDeserialize(using = Market.Deserializer.class, keyUsing = Market.MarketKeyDeserializer.class)
 public class Market {
     public static final String MARKET_SPLITTER = "_";
     String baseAsset;
@@ -65,6 +66,13 @@ public class Market {
         public Market deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             final String marketStr = p.readValueAs(String.class);
             return Market.parse(marketStr);
+        }
+    }
+
+    public static class MarketKeyDeserializer extends KeyDeserializer {
+        @Override
+        public Market deserializeKey(String key, DeserializationContext ctxt) {
+            return Market.parse(key);
         }
     }
 }

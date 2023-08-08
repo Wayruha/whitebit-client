@@ -3,8 +3,8 @@ package trade.wayruha.whitebit.dto.ws;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Data;
-import trade.wayruha.whitebit.domain.OrderEventType;
-import trade.wayruha.whitebit.dto.Order;
+import trade.wayruha.whitebit.domain.enums.OrderEventType;
+import trade.wayruha.whitebit.domain.Order;
 import trade.wayruha.whitebit.exception.ModelParserException;
 import trade.wayruha.whitebit.utils.ModelParser;
 

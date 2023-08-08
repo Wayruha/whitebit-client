@@ -1,6 +1,7 @@
 package trade.wayruha.whitebit.domain;
 
 import lombok.Data;
+import trade.wayruha.whitebit.domain.enums.OrderSide;
 
 import java.math.BigDecimal;
 

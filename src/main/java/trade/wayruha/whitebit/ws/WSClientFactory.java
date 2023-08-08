@@ -6,7 +6,7 @@ import trade.wayruha.whitebit.ClientConfig;
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.client.ApiClient;
 import trade.wayruha.whitebit.domain.Market;
-import trade.wayruha.whitebit.dto.Order;
+import trade.wayruha.whitebit.domain.Order;
 import trade.wayruha.whitebit.dto.request.ExecutedOrdersFilter;
 import trade.wayruha.whitebit.dto.ws.*;
 import trade.wayruha.whitebit.utils.ValueModelParser;

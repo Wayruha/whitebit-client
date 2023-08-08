@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Builder;
 import lombok.Data;
 import trade.wayruha.whitebit.domain.Market;
-import trade.wayruha.whitebit.domain.OrderSide;
+import trade.wayruha.whitebit.domain.enums.OrderSide;
 import trade.wayruha.whitebit.exception.ModelParserException;
 import trade.wayruha.whitebit.utils.ModelParser;
 

@@ -1,4 +1,4 @@
-package trade.wayruha.whitebit.domain;
+package trade.wayruha.whitebit.domain.enums;
 
 import java.util.Arrays;
 

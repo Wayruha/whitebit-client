@@ -7,7 +7,6 @@ import trade.wayruha.whitebit.dto.V1Response;
 import trade.wayruha.whitebit.service.endpoint.TickerEndpoint;
 
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 

@@ -5,6 +5,7 @@ import trade.wayruha.whitebit.TestConstants;
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.domain.AssetBalance;
 import trade.wayruha.whitebit.domain.MarginAssetBalance;
+import trade.wayruha.whitebit.domain.enums.Account;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -21,13 +22,13 @@ public class WalletServiceTest {
 
   @Test
   public void test_getTradeBalance() {
-    final AssetBalance balance = service.getTradeBalance(usdt);
+    final AssetBalance balance = service.getBalance(Account.TRADE, usdt);
     System.out.println("Balance: " + balance);
     assertEquals(usdt, balance.getAsset());
     assertNotNull(balance.getAvailable());
     assertNotNull(balance.getFreeze());
 
-    final Map<String, AssetBalance> balances = service.getTradeBalances();
+    final Map<String, AssetBalance> balances = (Map<String, AssetBalance>) service.getBalances(Account.TRADE);
     System.out.println("Balances: " + balances);
     assertNotNull(balances);
   }

@@ -24,7 +24,6 @@ public class OrderBook {
   private List<Level> bids;
 
   //TODO add methods to apply partial updates
-
   @Value
   @JsonDeserialize(using = Level.LevelDeserializer.class)
   public static class Level {

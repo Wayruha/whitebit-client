@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Fee {
@@ -13,32 +16,7 @@ public class Fee {
     private boolean isWithdrawal;
     private String ticker;
     private String name;
-    private String[] providers;
-    private Withdraw withdraw;
-    private Deposit deposit;
-
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class Withdraw {
-        private String max_amount;
-        private String min_amount;
-        private String fixed;
-        private Flex flex;
-    }
-
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class Deposit {
-        private String max_amount;
-        private String min_amount;
-        private String fixed;
-        private Flex flex;
-    }
-
-    @Data
-    public static class Flex {
-        private String percent;
-        private String min_fee;
-        private String max_fee;
-    }
+    private List<String> providers;
+    private FeeData withdraw;
+    private FeeData deposit;
 }

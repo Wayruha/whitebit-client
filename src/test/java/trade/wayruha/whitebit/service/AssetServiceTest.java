@@ -27,5 +27,10 @@ public class AssetServiceTest {
         Asset asset = response.get(symbol);
 
         assertNotNull(asset.getName());
+        assertNotNull(asset.getMaxDeposit());
+
+        assertNotNull(asset.getNetworks().getDefaultNetwork());
+
+        assertNotNull(asset.getLimits().getDeposit());
     }
 }

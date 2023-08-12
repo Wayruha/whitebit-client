@@ -26,5 +26,7 @@ public class FeesServiceTest {
 
         assertEquals(fee.getTicker(), ticker);
         assertTrue(fee.isDepositable());
+
+        assertNotNull(fee.getWithdraw().getMaxAmount());
     }
 }

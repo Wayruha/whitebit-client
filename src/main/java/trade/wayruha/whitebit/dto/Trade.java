@@ -2,6 +2,7 @@ package trade.wayruha.whitebit.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
+import trade.wayruha.whitebit.domain.enums.OrderSide;
 
 import java.math.BigDecimal;
 
@@ -15,5 +16,5 @@ public class Trade {
     private BigDecimal baseVolume;
     @JsonAlias("trade_timestamp")
     private long tradeTimestamp;
-    private String type;
+    private OrderSide type;
 }

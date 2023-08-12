@@ -4,6 +4,7 @@ import org.junit.Test;
 import trade.wayruha.whitebit.TestConstants;
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.domain.Market;
+import trade.wayruha.whitebit.domain.enums.OrderSide;
 import trade.wayruha.whitebit.dto.Asset;
 import trade.wayruha.whitebit.dto.Fee;
 import trade.wayruha.whitebit.dto.Trade;
@@ -59,7 +60,7 @@ public class PublicServiceTest {
 
         Trade trade = response.get(0);
 
-        assertEquals(trade.getType(), "sell");
+        assertEquals(trade.getType(), OrderSide.SELL);
     }
 
     @Test
@@ -70,6 +71,6 @@ public class PublicServiceTest {
 
         Trade trade = response.get(0);
 
-        assertEquals(trade.getType(), "buy");
+        assertEquals(trade.getType(), OrderSide.BUY);
     }
 }

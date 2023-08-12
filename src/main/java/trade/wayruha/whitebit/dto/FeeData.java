@@ -14,5 +14,5 @@ public class FeeData {
     @JsonAlias("min_amount")
     private BigDecimal minAmount;
     private BigDecimal fixed;
-    private FlexFee flex;
+    private FlexibleFee flex;
 }

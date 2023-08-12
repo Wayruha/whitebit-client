@@ -6,6 +6,7 @@ import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.domain.Market;
 import trade.wayruha.whitebit.dto.MarketInfo;
 import trade.wayruha.whitebit.dto.OrderBook;
+import trade.wayruha.whitebit.dto.Time;
 
 import java.util.List;
 import static org.junit.Assert.*;
@@ -51,4 +52,11 @@ public class MarketDataServiceTest {
     assertEquals(DEFAULT_DEPTH, orderBook.getBids().size());
     assertEquals(DEFAULT_DEPTH, orderBook.getBids().size());
   }
+
+  @Test
+  public void test_getServerTime() {
+    Time time = service.getServerTime();
+    assertNotNull(time);
+  }
+
 }

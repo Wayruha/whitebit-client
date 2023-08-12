@@ -5,6 +5,7 @@ import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.domain.Market;
 import trade.wayruha.whitebit.dto.MarketInfo;
 import trade.wayruha.whitebit.dto.OrderBook;
+import trade.wayruha.whitebit.dto.Time;
 import trade.wayruha.whitebit.service.endpoint.MarketDataEndpoint;
 
 import java.util.List;
@@ -27,5 +28,9 @@ public class MarketDataService extends ServiceBase {
 
   public OrderBook getOrderBook(Market symbol, @Nullable Integer depth, @Nullable Integer aggregationLevel) {
     return client.executeSync(api.getOrderBook(symbol, depth, aggregationLevel)).getData();
+  }
+
+  public Time getServerTime(){
+    return client.executeSync(api.getServerTime()).getData();
   }
 }

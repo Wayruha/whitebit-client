@@ -49,6 +49,15 @@ public class PublicDataService extends ServiceBase {
     return client.executeSync(api.getTrades(symbol, orderSide.getName())).getData();
   }
 
+  public Map<Market, MarketActivityV4> getAvailableTickers() {
+    return client.executeSync(api.getAvailableTickersV4()).getData();
+  }
+
+  public MarketActivityV4 getAvailableTicker(Market symbol) {
+    Map<Market, MarketActivityV4>  tickersResponse =  client.executeSync(api.getAvailableTickersV4()).getData();
+    return tickersResponse.get(symbol);
+  }
+
   public List<Market> getCollateralMarkets(){
     return client.executeSync(api.getCollateralMarkets()).getData().getResult();
   }

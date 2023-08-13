@@ -9,10 +9,10 @@ import trade.wayruha.whitebit.dto.wbcode.WBCodeRequest;
 import trade.wayruha.whitebit.dto.wbcode.WBCodeResponse;
 import trade.wayruha.whitebit.service.endpoint.WBCodesEndpoint;
 
-public class WhitebitCodeService extends ServiceBase {
+public class WhiteBitCodeService extends ServiceBase {
   private final WBCodesEndpoint api;
 
-  public WhitebitCodeService(ApiClient client) {
+  public WhiteBitCodeService(ApiClient client) {
     super(client);
     this.api = createService(WBCodesEndpoint.class);
   }

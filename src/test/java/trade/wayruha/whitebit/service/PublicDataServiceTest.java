@@ -144,4 +144,20 @@ public class PublicDataServiceTest {
     assertNotNull(market.getBrackets());
     assertTrue(market.getMaxLeverage() > 0);
   }
+
+  @Test
+  public void test_getAvailableTickers() {
+    Map<Market, MarketActivityV4> response = service.getAvailableTickers();
+    assertNotNull(response);
+    MarketActivityV4 ticker = response.get(BTC_USDT);
+    assertNotNull(ticker);
+    assertNotNull(ticker.getBaseVolume());
+  }
+
+  @Test
+  public void test_getAvailableTicker() {
+    MarketActivityV4 ticker = service.getAvailableTicker(BTC_USDT);
+    assertNotNull(ticker);
+    assertNotNull(ticker.getBaseVolume());
+  }
 }

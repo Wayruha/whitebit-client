@@ -7,8 +7,8 @@ import retrofit2.http.POST;
 import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.domain.AssetBalance;
 import trade.wayruha.whitebit.domain.MarginAssetBalance;
-import trade.wayruha.whitebit.dto.CollateralSummary;
-import trade.wayruha.whitebit.dto.request.TickerParameter;
+import trade.wayruha.whitebit.dto.*;
+import trade.wayruha.whitebit.dto.request.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,6 +24,15 @@ public interface WalletEndpoint {
   @POST("/api/v4/trade-account/balance")
   @Headers(APIConstant.ENDPOINT_SECURITY_SIGNED_HEADER)
   Call<AssetBalance> getTradeBalance(@Body TickerParameter req);
+
+  /** rate limit: 1000 requests/10sec */
+  @POST("/api/v4/main-account/balance")
+  @Headers(APIConstant.ENDPOINT_SECURITY_SIGNED_HEADER)
+  Call<Map<String, AssetBalance>> getMainBalances();
+
+  @POST("/api/v4/main-account/balance")
+  @Headers(APIConstant.ENDPOINT_SECURITY_SIGNED_HEADER)
+  Call<AssetBalance> getMainBalance(@Body TickerParameter req);
 
   /** rate limit: 100 requests/10sec */
   @POST("/api/v4/collateral-account/balance")
@@ -45,4 +54,8 @@ public interface WalletEndpoint {
   @Headers(APIConstant.ENDPOINT_SECURITY_SIGNED_HEADER)
   Call<CollateralSummary> getCollateralSummary();
 
+  /** rate limit: 100 requests/60sec */
+  @POST("/api/v4/main-account/transfer")
+  @Headers(APIConstant.ENDPOINT_SECURITY_SIGNED_HEADER)
+  Call<Void> universalTransfer(@Body TransferRequest request);
 }

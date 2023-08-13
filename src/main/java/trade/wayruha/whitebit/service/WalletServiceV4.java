@@ -3,8 +3,10 @@ package trade.wayruha.whitebit.service;
 import trade.wayruha.whitebit.WBConfig;
 import trade.wayruha.whitebit.domain.AssetBalance;
 import trade.wayruha.whitebit.domain.MarginAssetBalance;
+import trade.wayruha.whitebit.domain.enums.Account;
 import trade.wayruha.whitebit.dto.CollateralSummary;
 import trade.wayruha.whitebit.dto.request.TickerParameter;
+import trade.wayruha.whitebit.dto.request.TransferRequest;
 import trade.wayruha.whitebit.service.endpoint.WalletEndpoint;
 
 import java.math.BigDecimal;
@@ -12,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static trade.wayruha.whitebit.APIConstant.TRANSFER_AMOUNT_MAX_PRECISION;
 
 public class WalletServiceV4 extends ServiceBase {
   private final WalletEndpoint api;
@@ -21,16 +25,47 @@ public class WalletServiceV4 extends ServiceBase {
     this.api = createService(WalletEndpoint.class);
   }
 
-  public AssetBalance getTradeBalance(String asset) {
-    final AssetBalance balance = client.executeSync(api.getTradeBalance(new TickerParameter(asset))).getData();
+  public AssetBalance getBalance(Account account, String asset) {
+    final AssetBalance balance;
+    switch (account) {
+      case MAIN:
+        balance = client.executeSync(api.getMainBalance(new TickerParameter(asset))).getData();
+        break;
+      case TRADE:
+        balance = client.executeSync(api.getTradeBalance(new TickerParameter(asset))).getData();
+        break;
+      case COLLATERAL:
+        return getCollateralBalance(asset);
+      default:
+        throw new IllegalArgumentException("Unsupported Account: " + account);
+    }
     balance.setAsset(asset);
     return balance;
   }
 
-  public Map<String, AssetBalance> getTradeBalances() {
-    final Map<String, AssetBalance> balances = client.executeSync(api.getTradeBalances()).getData();
-    preProcessBalances(balances);
-    return balances;
+  public Map<String, ? extends AssetBalance> getBalances(Account account) {
+    final Map<String, AssetBalance> balances;
+    switch (account) {
+      case MAIN:
+        balances = client.executeSync(api.getMainBalances()).getData();
+        preProcessBalances(balances);
+        return balances;
+      case TRADE:
+        balances = client.executeSync(api.getTradeBalances()).getData();
+        preProcessBalances(balances);
+        return balances;
+      case COLLATERAL:
+        return getCollateralBalances();
+
+      default:
+        throw new IllegalArgumentException("Unsupported Account: " + account);
+    }
+  }
+
+  public void transfer(TransferRequest request) {
+    if (request.getQty().scale() > TRANSFER_AMOUNT_MAX_PRECISION)
+      throw new IllegalArgumentException("Max precision is " + TRANSFER_AMOUNT_MAX_PRECISION);
+    client.executeSync(api.universalTransfer(request));
   }
 
   public MarginAssetBalance getCollateralBalance(String asset) {

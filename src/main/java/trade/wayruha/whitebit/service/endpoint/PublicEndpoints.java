@@ -5,7 +5,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import trade.wayruha.whitebit.domain.Market;
-import trade.wayruha.whitebit.domain.enums.OrderSide;
 import trade.wayruha.whitebit.dto.*;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public interface PublicEndpoints {
 
     /** rate limit: 2000 requests/10sec */
     @GET("/api/v4/public/trades/{market}")
-    Call<List<Trade>> getTrades(@Path("market") Market symbol, @Query("type") OrderSide type);
+    Call<List<Trade>> getTrades(@Path("market") Market symbol, @Query("type") String type);
 
     /** rate limit: 2000 requests/10sec */
     @GET("/api/v4/public/markets")

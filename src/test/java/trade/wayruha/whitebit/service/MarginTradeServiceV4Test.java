@@ -20,12 +20,9 @@ import static trade.wayruha.whitebit.TestUtils.compareOrderWithRequested;
 
 public class MarginTradeServiceV4Test {
   final WBConfig config = TestConstants.getSimpleConfig();
-  final String usdt = "USDT";
-  final String xrp = "XRP";
-  final String eth = "ETH";
   final Market market = Market.parse("XRP_USDT");
   final MarginTradeServiceV4 marginService = new MarginTradeServiceV4(config);
-  final SpotTradeServiceV4 spotService = new SpotTradeServiceV4(config);
+  final OrderService orderService = new OrderService(config);
 
   /**
    * WARNING: real order is going to be created
@@ -45,7 +42,7 @@ public class MarginTradeServiceV4Test {
 
     // fetch it from Open Orders
     final OrderDetailsRequest orderQuery = OrderDetailsRequest.byId(order.getMarket(), order.getOrderId());
-    order = spotService.getOpenOrders(orderQuery).get(0);
+    order = orderService.getOpenOrders(orderQuery).get(0);
     compareOrderWithRequested(orderRequest, order);
     assertEquals(OrderType.MARGIN_LIMIT, order.getType());
 
@@ -57,16 +54,16 @@ public class MarginTradeServiceV4Test {
     assertNull(position.getPnl());
 
     // cancel order
-    order = spotService.cancelOrder(new OrderID(market, order.getOrderId()));
+    order = orderService.cancelOrder(new OrderID(market, order.getOrderId()));
     compareOrderWithRequested(orderRequest, order);
     assertEquals(OrderType.MARGIN_LIMIT, order.getType());
 
     // ensure it's not in Open Orders and positions anymore
-    assertEquals(0, spotService.getOpenOrders(orderQuery).size());
+    assertEquals(0, orderService.getOpenOrders(orderQuery).size());
     assertEquals(0, marginService.getOpenPositions(order.getMarket()).size());
 
     // check if it's present in orders history (cancelled orders are not visible in history)
-    final Map<Market, List<Order>> ordersHistory = spotService.getOrdersHistory(OrderDetailsRequest.all());
+    final Map<Market, List<Order>> ordersHistory = orderService.getOrdersHistory(OrderDetailsRequest.all());
     ordersHistory.forEach((k, v) -> v.forEach(TestUtils::validateOrder));
   }
 
@@ -89,7 +86,7 @@ public class MarginTradeServiceV4Test {
 
     // fetch it from Open Orders
     final OrderDetailsRequest orderQuery = OrderDetailsRequest.byClientOrderId(order.getMarket(), order.getClientOrderId());
-    assertEquals(0, spotService.getOpenOrders(orderQuery).size());
+    assertEquals(0, orderService.getOpenOrders(orderQuery).size());
 
     //check for open position
     final MarginPosition position = marginService.getOpenPositions(order.getMarket()).get(0);
@@ -103,7 +100,7 @@ public class MarginTradeServiceV4Test {
     assertEquals(OrderType.MARGIN_MARKET, order.getType());
 
     // ensure it's not in Open Orders and positions anymore
-    assertEquals(0, spotService.getOpenOrders(orderQuery).size());
+    assertEquals(0, orderService.getOpenOrders(orderQuery).size());
     assertEquals(0, marginService.getOpenPositions(order.getMarket()).size());
 
     final List<MarginPosition> history = marginService.getPositionsHistory(PositionsRequest.byId(position.getPositionId()));
@@ -127,7 +124,7 @@ public class MarginTradeServiceV4Test {
 
     // fetch it from Open Orders
     final OrderDetailsRequest orderQuery = OrderDetailsRequest.byId(order.getMarket(), order.getOrderId());
-    order = spotService.getOpenOrders(orderQuery).get(0);
+    order = orderService.getOpenOrders(orderQuery).get(0);
     compareOrderWithRequested(orderRequest, order);
     assertEquals(OrderType.MARGIN_STOP_LIMIT, order.getType());
 
@@ -136,16 +133,16 @@ public class MarginTradeServiceV4Test {
     assertEquals(0, positions.size());
 
     // cancel order
-    order = spotService.cancelOrder(new OrderID(market, order.getOrderId()));
+    order = orderService.cancelOrder(new OrderID(market, order.getOrderId()));
     compareOrderWithRequested(orderRequest, order);
     assertEquals(OrderType.MARGIN_STOP_LIMIT, order.getType());
 
     // ensure it's not in Open Orders and positions anymore
-    assertEquals(0, spotService.getOpenOrders(orderQuery).size());
+    assertEquals(0, orderService.getOpenOrders(orderQuery).size());
     assertEquals(0, marginService.getOpenPositions(order.getMarket()).size());
 
     // check if it's present in orders history (cancelled orders are not visible in history)
-    final Map<Market, List<Order>> ordersHistory = spotService.getOrdersHistory(OrderDetailsRequest.all());
+    final Map<Market, List<Order>> ordersHistory = orderService.getOrdersHistory(OrderDetailsRequest.all());
     ordersHistory.forEach((k, v) -> v.forEach(TestUtils::validateOrder));
   }
 
@@ -165,7 +162,7 @@ public class MarginTradeServiceV4Test {
     assertEquals(ActivationCondition.LTE, stopOrder.getActivationCondition());
     assertEquals(OrderType.MARGIN_STOP_MARKET, stopOrder.getType());
 
-    Order order = spotService.cancelOrder(new OrderID(market, stopOrder.getOrderId()));
+    Order order = orderService.cancelOrder(new OrderID(market, stopOrder.getOrderId()));
     compareOrderWithRequested(orderRequest, order);
     assertEquals(OrderType.MARGIN_STOP_MARKET, order.getType());
   }

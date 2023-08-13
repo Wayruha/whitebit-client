@@ -1,6 +1,5 @@
 package trade.wayruha.whitebit;
 
-import java.util.List;
 import java.util.Set;
 
 public class APIConstant {

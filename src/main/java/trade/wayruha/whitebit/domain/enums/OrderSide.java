@@ -15,13 +15,17 @@ public enum OrderSide {
   SELL("sell", 1),
   BUY("buy", 2);
 
-  @JsonValue
   private final String name;
   private final int code;
 
   OrderSide(String name, int id) {
     this.name = name;
     this.code = id;
+  }
+
+  @JsonValue
+  public String getName() {
+    return name;
   }
 
   public static OrderSide fromCode(int code) {

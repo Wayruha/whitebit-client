@@ -10,6 +10,8 @@ import trade.wayruha.whitebit.service.endpoint.PublicEndpoints;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 public class PublicDataService extends ServiceBase {
   private final PublicEndpoints api;
 
@@ -43,7 +45,8 @@ public class PublicDataService extends ServiceBase {
   }
 
   public List<Trade> getTrades(Market symbol, OrderSide orderSide) {
-    return client.executeSync(api.getTrades(symbol, orderSide)).getData();
+    requireNonNull(orderSide);
+    return client.executeSync(api.getTrades(symbol, orderSide.getName())).getData();
   }
 
   public List<Market> getCollateralMarkets(){

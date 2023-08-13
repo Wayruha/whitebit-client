@@ -14,7 +14,7 @@ import static java.math.BigDecimal.ZERO;
 @NoArgsConstructor
 public class AssetBalance {
   protected String asset;
-  @JsonAlias({"available", "balance", "B"})
+  @JsonAlias({"available", "balance", "B", "main_balance"})
   protected BigDecimal available = ZERO;
   protected BigDecimal freeze = ZERO;
 

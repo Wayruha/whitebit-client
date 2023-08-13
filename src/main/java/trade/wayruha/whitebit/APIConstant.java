@@ -34,5 +34,11 @@ public class APIConstant {
   public static final int FETCH_ORDERS_MAX_LIMIT = 100;
   public static final int FETCH_ORDERS_MAX_OFFSET = 10000;
 
+  public static final int TRANSFER_AMOUNT_MAX_PRECISION = 8;
+
   public static final Set<Integer> MARGIN_LEVERAGE_ACCEPTABLE_VALUES = Set.of(1, 2, 3, 5, 10, 20, 50, 100);
+
+  public static final String STATUS_ENABLED = "1";
+  public static final String STATUS_DISABLED = "0";
+
 }

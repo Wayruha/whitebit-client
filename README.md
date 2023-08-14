@@ -41,9 +41,10 @@ The usage is simple:
 ```
 
 ## Contribution
+Co-authored with KushnerykPavel.
 
-If you'd like to contribute to the development of this library, please submit issues or PRs 
+If you'd like to contribute to the development of this library, please submit issues or PRs.
 
 ## Support
 
-For questions or issues, feel free to reach out at rwdiachuk@gmail.com
+For questions or issues, feel free to reach out at rwdiachuk@gmail.com.

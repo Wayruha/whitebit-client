@@ -9,8 +9,8 @@ public class WBConfig {
   public static final String DEFAULT_HTTP_HOST = "https://whitebit.com/";
   public static final String DEFAULT_WS_HOST = "wss://api.whitebit.com/ws";
 
-  private String apiKey;
-  private String apiSecret;
+  private final String apiKey;
+  private final String apiSecret;
   private String host = DEFAULT_HTTP_HOST;
   private String webSocketHost = DEFAULT_WS_HOST;
 
@@ -34,5 +34,10 @@ public class WBConfig {
   public WBConfig(String apiKey, String apiSecret) {
     this.apiKey = apiKey;
     this.apiSecret = apiSecret;
+  }
+
+  public WBConfig() {
+    this.apiKey = null;
+    this.apiSecret = null;
   }
 }

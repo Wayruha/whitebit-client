@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.ClientConfig;
+import trade.wayruha.whitebit.exception.InvalidAPIKeys;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -17,6 +18,7 @@ import java.util.Base64;
 import java.util.Formatter;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isAnyBlank;
 import static trade.wayruha.whitebit.APIConstant.*;
 
 /**
@@ -46,6 +48,8 @@ public class AuthenticationInterceptor implements Interceptor {
     if (!isSigned) return chain.proceed(origRequest);
     if (!origRequest.method().equalsIgnoreCase("POST"))
       throw new IllegalArgumentException("Only POST is allowed for signed requests and they must have a RequestBody:" + origRequest.url());
+    if (isAnyBlank(apiKey, apiKey))
+      throw new InvalidAPIKeys("API Key/Secret must be specified to access private endpoints");
 
     final Request.Builder builder = origRequest.newBuilder();
     builder.removeHeader(APIConstant.ENDPOINT_SECURITY_SIGNED);
@@ -62,17 +66,17 @@ public class AuthenticationInterceptor implements Interceptor {
   }
 
   private static String encodeBody(String enrichedBody) {
-   return Base64.getEncoder().encodeToString(enrichedBody.getBytes());
- }
+    return Base64.getEncoder().encodeToString(enrichedBody.getBytes());
+  }
 
   /**
    * All signed endpoints requires sending some mandatory parameters
    * This method enrich existing RequestBody (json) with mandatory parameters.
    * Algorithm: find the end of the root object and prepend it with json parameters
    */
-  private String enrichBody(RequestBody origBody, Request req){
+  private String enrichBody(RequestBody origBody, Request req) {
     String bodyJson = bodyToString(origBody);
-    if(StringUtils.isBlank(bodyJson)) bodyJson = "{}";
+    if (StringUtils.isBlank(bodyJson)) bodyJson = "{}";
 
     final String url = req.url().encodedPath();
     final String actionPart = format(REQUEST_JSON_PARAMETER_FORMAT, url);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class AssetInfo {
   @JsonAlias("max_deposit")
   private BigDecimal maxDeposit;
   private Networks networks;
-  private Map<String, Integer> confirmations;
+  private Map<String, Integer> confirmations = Collections.emptyMap();
   private Limits limits;
   @JsonAlias("currency_precision")
   private long currencyPrecision;
@@ -38,21 +39,16 @@ public class AssetInfo {
 
   @Data
   public static class Networks {
-    private List<String> deposits;
-    private List<String> withdraws;
+    private List<String> deposits = Collections.emptyList();
+    private List<String> withdraws = Collections.emptyList();
     @JsonAlias("default")
     private String defaultNetwork;
   }
 
   @Data
-  public static class Confirmations {
-    private Map<String, Integer> ERC20;
-  }
-
-  @Data
   public static class Limits {
-    private Map<String, NetworkLimits> deposit;
-    private Map<String, NetworkLimits> withdraw;
+    private Map<String, NetworkLimits> deposit = Collections.emptyMap();
+    private Map<String, NetworkLimits> withdraw = Collections.emptyMap();
   }
 
   @Data

@@ -3,6 +3,7 @@ package trade.wayruha.whitebit.service;
 import org.junit.Test;
 import trade.wayruha.whitebit.TestConstants;
 import trade.wayruha.whitebit.WBConfig;
+import trade.wayruha.whitebit.domain.enums.TransactionMethod;
 import trade.wayruha.whitebit.dto.DepositAddressResponse;
 import trade.wayruha.whitebit.dto.PageableResponse;
 import trade.wayruha.whitebit.dto.TransactionFees;
@@ -13,8 +14,7 @@ import trade.wayruha.whitebit.dto.request.TransferRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static trade.wayruha.whitebit.domain.enums.Account.MAIN;
 import static trade.wayruha.whitebit.domain.enums.Account.TRADE;
 
@@ -41,11 +41,29 @@ public class AccountServiceTest {
   }
 
   @Test
-  public void test_getTransactionHistory() {
+  public void test_getTransactionHistory_Deposit() {
     final TransactionHistoryRequest req = new TransactionHistoryRequest();
+    req.setTransactionMethod(TransactionMethod.DEPOSIT);
     final PageableResponse<TransactionRecord> transactionHistory = service.getTransactionHistory(req);
     System.out.println("TransactionHistory: " + transactionHistory);
     transactionHistory.getData().forEach(record -> {
+      assertEquals(TransactionMethod.DEPOSIT, record.getMethod());
+      assertTrue(record.getCreatedAt() > 0);
+      assertNotNull(record.getCurrency());
+      assertNotNull(record.getTicker());
+      assertNotNull(record.getTransactionId());
+      assertNotNull(record.getAmount());
+    });
+  }
+
+  @Test
+  public void test_getTransactionHistoryWithdraw() {
+    final TransactionHistoryRequest req = new TransactionHistoryRequest();
+    req.setTransactionMethod(TransactionMethod.WITHDRAW);
+    final PageableResponse<TransactionRecord> transactionHistory = service.getTransactionHistory(req);
+    System.out.println("TransactionHistory: " + transactionHistory);
+    transactionHistory.getData().forEach(record -> {
+      assertEquals(TransactionMethod.WITHDRAW, record.getMethod());
       assertTrue(record.getCreatedAt() > 0);
       assertNotNull(record.getCurrency());
       assertNotNull(record.getTicker());

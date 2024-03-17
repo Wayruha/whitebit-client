@@ -80,7 +80,7 @@ public class AuthenticationInterceptor implements Interceptor {
 
     final String url = req.url().encodedPath();
     final String actionPart = format(REQUEST_JSON_PARAMETER_FORMAT, url);
-    final String noncePart = format(MANDATORY_PARAM_NONCE, ClientConfig.getCurrentTime());
+    final String noncePart = format(MANDATORY_PARAM_NONCE, ClientConfig.getCurrentMillis());
     final String nonceWindowPart = format(MANDATORY_PARAM_NONCE_WINDOW, ClientConfig.isEnableNonceWindow());
     String mainPart = bodyJson.substring(0, bodyJson.lastIndexOf(JSON_OBJECT_END));
     return mainPart + (mainPart.length() > 2 ? COMMA : "") +

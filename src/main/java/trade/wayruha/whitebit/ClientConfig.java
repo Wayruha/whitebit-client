@@ -20,13 +20,21 @@ public class ClientConfig {
   @Setter
   private static boolean enableNonceWindow = true;
 
+  private static volatile long lastRequestedTime;
+
   /**
    * return current Unix epoch time in millis.
    * It's preferred to call this method instead of obtaining it by yourself.
    * Some `aligning` logic may be added in future (in case if there's a big discrepancy between local and server's time)
    */
-  public static long getCurrentTime() {
-    return System.currentTimeMillis();
+  public synchronized static long getCurrentMillis() {
+    final long now = System.currentTimeMillis();
+    if(now > lastRequestedTime) {
+      lastRequestedTime = now;
+    } else {
+      lastRequestedTime++;
+    }
+    return lastRequestedTime;
   }
 
   private static ObjectMapper createObjectMapper() {

@@ -5,17 +5,26 @@ import org.junit.Test;
 import trade.wayruha.whitebit.TestConstants;
 import trade.wayruha.whitebit.TestUtils;
 import trade.wayruha.whitebit.WBConfig;
-import trade.wayruha.whitebit.domain.*;
+import trade.wayruha.whitebit.domain.MarginPosition;
+import trade.wayruha.whitebit.domain.Market;
+import trade.wayruha.whitebit.domain.Order;
+import trade.wayruha.whitebit.domain.OrderID;
+import trade.wayruha.whitebit.domain.StopOrder;
 import trade.wayruha.whitebit.domain.enums.ActivationCondition;
 import trade.wayruha.whitebit.domain.enums.OrderSide;
 import trade.wayruha.whitebit.domain.enums.OrderType;
-import trade.wayruha.whitebit.dto.request.*;
+import trade.wayruha.whitebit.dto.request.AccountLeverageInfo;
+import trade.wayruha.whitebit.dto.request.NewOrderRequest;
+import trade.wayruha.whitebit.dto.request.OrderDetailsRequest;
+import trade.wayruha.whitebit.dto.request.PositionsRequest;
+import trade.wayruha.whitebit.dto.request.StopOrderRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static trade.wayruha.whitebit.TestUtils.compareOrderWithRequested;
 
 public class MarginTradeServiceV4Test {
@@ -33,7 +42,7 @@ public class MarginTradeServiceV4Test {
     //create limit order
     final BigDecimal baseQty = new BigDecimal("10");
     final BigDecimal price = new BigDecimal("0.55");
-    final NewOrderRequest orderRequest = NewOrderRequest.marginLimitOrder(market, OrderSide.BUY, baseQty, price);
+    final NewOrderRequest orderRequest = NewOrderRequest.marginLimitOrder(market, OrderSide.BUY, baseQty, price, null, null, null);
     Order order = marginService.createOrder(orderRequest);
 
     //assert correct response format

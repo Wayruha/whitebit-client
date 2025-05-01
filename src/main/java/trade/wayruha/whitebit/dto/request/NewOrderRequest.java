@@ -11,8 +11,6 @@ import trade.wayruha.whitebit.domain.enums.OrderType;
 
 import java.math.BigDecimal;
 
-import static java.util.Objects.nonNull;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,7 +23,9 @@ public class NewOrderRequest {
   private Boolean postOnly;
   private Boolean ioc;
 
-  /** amount refers to base asset for LIMIT BUY/SELL and MARKET SELL. For MARKET BUY orders, amount refers to quote asset   */
+  /**
+   * amount refers to base asset for LIMIT BUY/SELL and MARKET SELL. For MARKET BUY orders, amount refers to quote asset
+   */
   private BigDecimal amount;
   @JsonIgnore
   private OrderType orderType;
@@ -43,7 +43,7 @@ public class NewOrderRequest {
   }
 
   public static NewOrderRequest limitOrder(Market market, OrderSide side, BigDecimal baseQty, BigDecimal price,
-                                              String clientOrderId, Boolean postOnly, Boolean ioc) {
+                                           String clientOrderId, Boolean postOnly, Boolean ioc) {
     return NewOrderRequest.builder()
         .orderType(OrderType.LIMIT).market(market).side(side).amount(baseQty).price(price).clientOrderId(clientOrderId)
         .postOnly(postOnly).ioc(ioc)
@@ -55,7 +55,12 @@ public class NewOrderRequest {
   }
 
   public static NewOrderRequest marginLimitOrder(Market market, OrderSide side, BigDecimal baseQty, BigDecimal price) {
-    final NewOrderRequest req = limitOrder(market, side, baseQty, price, null, null, null);
+    return marginLimitOrder(market, side, baseQty, price, null, null, null);
+  }
+
+  public static NewOrderRequest marginLimitOrder(Market market, OrderSide side, BigDecimal baseQty, BigDecimal price,
+                                                 String clientOrderId, Boolean postOnly, Boolean ioc) {
+    final NewOrderRequest req = limitOrder(market, side, baseQty, price, clientOrderId, postOnly, ioc);
     req.setOrderType(OrderType.MARGIN_LIMIT);
     return req;
   }

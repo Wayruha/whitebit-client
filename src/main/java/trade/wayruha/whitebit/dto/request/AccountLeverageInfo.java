@@ -1,8 +1,12 @@
 package trade.wayruha.whitebit.dto.request;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountLeverageInfo {
-  int leverage;
+  private int leverage;
 }

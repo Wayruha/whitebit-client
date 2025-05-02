@@ -8,14 +8,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 import okio.ByteString;
 import trade.wayruha.whitebit.APIConstant;
 import trade.wayruha.whitebit.WBConfig;
-import trade.wayruha.whitebit.utils.ModelParser;
-import trade.wayruha.whitebit.exception.WebSocketException;
 import trade.wayruha.whitebit.client.ApiClient;
+import trade.wayruha.whitebit.exception.WebSocketException;
 import trade.wayruha.whitebit.utils.IdGenerator;
+import trade.wayruha.whitebit.utils.ModelParser;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -75,6 +78,7 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     this.id = IdGenerator.getNextId();
     this.logPrefix = "[ws-" + this.id + "]";
   }
+
   protected void connect(Set<Subscription> subscriptions) {
     if (this.state != WSState.CONNECTED && this.state != WSState.CONNECTING) {
       log.debug("{} Connecting to channels {} ...", logPrefix, subscriptions);
@@ -108,7 +112,9 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
   public boolean sendRequest(WSRequest request) {
     boolean result = false;
     final String requestStr = objectMapper.writeValueAsString(request);
-    log.debug("{} Try to send request {}", logPrefix, requestStr);
+    if (!request.equals(pingRequest)) {
+      log.debug("{} Try to send request {}", logPrefix, requestStr);
+    }
     if (nonNull(webSocket)) {
       result = webSocket.send(requestStr);
     }
@@ -177,7 +183,8 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
     lastReceivedTime = System.currentTimeMillis();
     try {
       final ObjectNode response = objectMapper.readValue(text, ObjectNode.class);
-      if(response.has(WS_METHOD_FIELD) && !response.get(WS_METHOD_FIELD).asText().equalsIgnoreCase("depth_update")) log.debug("{} onMessage WS event: {}", logPrefix, text);
+      if (response.has(WS_METHOD_FIELD) && !response.get(WS_METHOD_FIELD).asText().equalsIgnoreCase("depth_update"))
+        log.debug("{} onMessage WS event: {}", logPrefix, text);
       final JsonNode resultNode = response.get(WS_RESULT_PARAM);
       if (nonNull(resultNode)) {
         if (resultNode.asText().equalsIgnoreCase(WS_PONG_TEXT)) {
@@ -258,9 +265,9 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
   }
 
   @SneakyThrows
-  static String extractResponseBody(Response response){
-    if(isNull(response)) return null;
-    if(isNull(response.body())) return null;
+  static String extractResponseBody(Response response) {
+    if (isNull(response)) return null;
+    if (isNull(response.body())) return null;
     return response.body().string();
   }
 

@@ -175,9 +175,9 @@ public class WebSocketSubscriptionClient<T> extends WebSocketListener {
   public void onMessage(WebSocket webSocket, String text) {
     super.onMessage(webSocket, text);
     lastReceivedTime = System.currentTimeMillis();
-    log.debug("{} onMessage WS event: {}", logPrefix, text);
     try {
       final ObjectNode response = objectMapper.readValue(text, ObjectNode.class);
+      if(response.has(WS_METHOD_FIELD) && !response.get(WS_METHOD_FIELD).asText().equalsIgnoreCase("depth_update")) log.debug("{} onMessage WS event: {}", logPrefix, text);
       final JsonNode resultNode = response.get(WS_RESULT_PARAM);
       if (nonNull(resultNode)) {
         if (resultNode.asText().equalsIgnoreCase(WS_PONG_TEXT)) {

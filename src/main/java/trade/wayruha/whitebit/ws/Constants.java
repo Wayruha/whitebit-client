@@ -12,4 +12,6 @@ class Constants {
 
     static final String WS_STATUS_SUCCESS = "success";
     static final String WS_PONG_TEXT = "pong";
+    static final String WS_METHOD_FIELD = "method";
+
 }

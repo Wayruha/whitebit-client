@@ -20,6 +20,7 @@ public class Order {
   private OrderSide side;
   private OrderType type;
   private BigDecimal price;
+  private String status;
   private BigDecimal amount;
   @JsonAlias({"dealStock", "deal_stock"})
   private BigDecimal filledQty;
